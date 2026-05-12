@@ -103,3 +103,4 @@ Para cPanel em subpasta use VITE_BASE_PATH=/checkserv/
 - O app apps/api já está configurado para transpilar pacotes do monorepo na build.
 - Os apps Vite já usam VITE_API_URL para comunicação com a API.
 - Se houver bloqueio de autenticação por cookies entre domínios, valide CORS e política de cookies no backend.
+- **Canvas e gráficos**: O pacote `canvas` é opcional na Vercel. Se a geração de gráficos em PDFs falhar, é porque a compilação nativa não conseguiu em ambiente Linux. Isso não afeta o funcionamento da API, apenas a renderização de gráficos complexos em relatórios. A API continua a funcionar normalmente.
