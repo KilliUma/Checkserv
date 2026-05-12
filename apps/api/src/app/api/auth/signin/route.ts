@@ -1,0 +1,113 @@
+import { NextResponse } from 'next/server'
+import { compare } from 'bcryptjs'
+import { prisma } from '@wearcheck/database'
+import { sign } from 'jsonwebtoken'
+import { cookies } from 'next/headers'
+
+export async function POST(request: Request) {
+  try {
+    const { email, password } = await request.json()
+
+    if (!email || !password) {
+      return NextResponse.json(
+        { error: 'Email e password são obrigatórios' },
+        { status: 400 }
+      )
+    }
+
+    // Buscar usuário
+    const user = await prisma.user.findUnique({
+      where: { email },
+      include: {
+        customer: {
+          select: {
+            id: true,
+            name: true,
+            status: true,
+          },
+        },
+      },
+    })
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Credenciais inválidas' },
+        { status: 401 }
+      )
+    }
+
+    // Verificar status
+    if (user.status !== 'ACTIVE') {
+      const message = user.status === 'PENDING' 
+        ? 'Sua conta está aguardando aprovação do administrador'
+        : 'Conta inativa ou suspensa'
+      
+      return NextResponse.json(
+        { error: message },
+        { status: 403 }
+      )
+    }
+
+    // Verificar customer status (se houver)
+    if (user.customer && user.customer.status !== 'ACTIVE') {
+      return NextResponse.json(
+        { error: 'Conta da empresa inativa' },
+        { status: 403 }
+      )
+    }
+
+    // Verificar password
+    const isPasswordValid = await compare(password, user.password)
+    if (!isPasswordValid) {
+      return NextResponse.json(
+        { error: 'Credenciais inválidas' },
+        { status: 401 }
+      )
+    }
+
+    // Atualizar lastLoginAt
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastLoginAt: new Date() },
+    })
+
+    // Criar token JWT
+    const token = sign(
+      {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        customerId: user.customerId,
+      },
+      process.env.NEXTAUTH_SECRET || 'secret',
+      { expiresIn: '7d' }
+    )
+
+    // Definir cookie
+    const cookieStore = cookies()
+    cookieStore.set('auth-token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60, // 7 dias
+      path: '/',
+    })
+
+    // Retornar sessão
+    return NextResponse.json({
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        customerId: user.customerId,
+      },
+    })
+  } catch (error) {
+    console.error('Erro no login:', error)
+    return NextResponse.json(
+      { error: 'Erro interno do servidor' },
+      { status: 500 }
+    )
+  }
+}

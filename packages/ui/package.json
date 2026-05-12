@@ -1,0 +1,19 @@
+{
+  "name": "@wearcheck/ui",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.379.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.2",
+    "typescript": "^5.4.5"
+  }
+}

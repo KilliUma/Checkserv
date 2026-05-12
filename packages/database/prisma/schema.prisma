@@ -1,0 +1,732 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ========================================
+// 🔐 AUTHENTICATION & USERS
+// ========================================
+
+enum UserRole {
+  SUPER_ADMIN      // Acesso total ao sistema
+  ADMIN            // Gestor de cliente/empresa
+  LAB_TECHNICIAN   // Técnico de laboratório
+  CUSTOMER_USER    // Utilizador cliente normal
+  READONLY         // Apenas visualização
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING
+}
+
+model User {
+  id            String      @id @default(cuid())
+  email         String      @unique
+  name          String
+  password      String      // Hash bcrypt
+  role          UserRole    @default(CUSTOMER_USER)
+  status        UserStatus  @default(PENDING)
+  emailVerified DateTime?
+  phone         String?
+  avatar        String?
+  
+  // Multi-tenant
+  customerId    String?
+  customer      Customer?   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  
+  // Preferências
+  preferences   Json?       // { notifications: { email: true }, language: 'pt', timezone: 'Africa/Johannesburg' }
+  
+  // Timestamps
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  lastLoginAt   DateTime?
+  
+  // Relações
+  sessions      Session[]
+  samples       Sample[]
+  reports       Report[]
+  feedbacks     Feedback[]
+  auditLogs     AuditLog[]
+  notifications Notification[]
+  
+  @@index([email])
+  @@index([customerId])
+  @@map("users")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@map("sessions")
+}
+
+// ========================================
+// 🏢 CUSTOMERS (Multi-tenant)
+// ========================================
+
+enum CustomerStatus {
+  ACTIVE
+  INACTIVE
+  TRIAL
+  SUSPENDED
+}
+
+model Customer {
+  id              String         @id @default(cuid())
+  name            String
+  tradingName     String?
+  registrationNo  String?        @unique // VAT/Company Registration
+  status          CustomerStatus @default(TRIAL)
+  
+  // Contacto
+  email           String
+  phone           String?
+  website         String?
+  
+  // Endereço
+  addressLine1    String?
+  addressLine2    String?
+  city            String?
+  state           String?
+  postalCode      String?
+  country         String         @default("ZA")
+  
+  // Billing
+  billingEmail    String?
+  taxNumber       String?
+  
+  // Settings
+  settings        Json?          // Configurações específicas do cliente
+  
+  // Timestamps
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  
+  // Relações
+  users           User[]
+  equipment       Equipment[]
+  samples         Sample[]
+  reports         Report[]
+  sites           Site[]
+  
+  @@index([registrationNo])
+  @@map("customers")
+}
+
+// ========================================
+// 📍 SITES (Localizações do cliente)
+// ========================================
+
+model Site {
+  id           String     @id @default(cuid())
+  name         String
+  code         String     // Site code (ex: JHB-01)
+  
+  customerId   String
+  customer     Customer   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  
+  // Endereço
+  addressLine1 String?
+  city         String?
+  country      String     @default("ZA")
+  
+  // Contacto
+  contactName  String?
+  contactPhone String?
+  contactEmail String?
+  
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  
+  equipment    Equipment[]
+  samples      Sample[]
+  
+  @@unique([customerId, code])
+  @@index([customerId])
+  @@map("sites")
+}
+
+// ========================================
+// 🛠️ EQUIPMENT & COMPONENTS
+// ========================================
+
+enum EquipmentStatus {
+  ACTIVE
+  INACTIVE
+  MAINTENANCE
+  DECOMMISSIONED
+}
+
+enum ComponentType {
+  ENGINE
+  TRANSMISSION
+  HYDRAULIC_SYSTEM
+  GEARBOX
+  DIFFERENTIAL
+  COOLANT_SYSTEM
+  FUEL_SYSTEM
+  COMPRESSOR
+  TURBINE
+  BEARING
+  OTHER
+}
+
+model Equipment {
+  id              String           @id @default(cuid())
+  
+  // Identificação
+  equipmentNo     String           // Número do equipamento
+  description     String
+  serialNumber    String?
+  manufacturer    String?
+  model           String?
+  year            Int?
+  
+  // Status
+  status          EquipmentStatus  @default(ACTIVE)
+  
+  // Localização
+  customerId      String
+  customer        Customer         @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  
+  siteId          String?
+  site            Site?            @relation(fields: [siteId], references: [id], onDelete: SetNull)
+  
+  // Leitura (horímetro/odómetro)
+  currentReading  Float?           // Horas ou KM
+  readingUnit     String?          // "hours" | "km"
+  
+  // Tags/Labels
+  tags            String[]         // ["Mining", "Critical", "Fleet-A"]
+  
+  // Metadata
+  metadata        Json?            // Dados adicionais específicos
+  
+  // Timestamps
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  
+  // Relações
+  components      Component[]
+  samples         Sample[]
+  
+  @@unique([customerId, equipmentNo])
+  @@index([customerId])
+  @@index([status])
+  @@map("equipment")
+}
+
+model Component {
+  id              String          @id @default(cuid())
+  
+  // Identificação
+  componentNo     String
+  type            ComponentType
+  description     String
+  manufacturer    String?
+  model           String?
+  serialNumber    String?
+  
+  // Equipment parent
+  equipmentId     String
+  equipment       Equipment       @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+  
+  // Compartimento
+  compartment     String?         // "Engine", "Transmission", etc.
+  
+  // Fluid specs
+  fluidType       String?         // "Engine Oil", "Hydraulic Oil", etc.
+  fluidGrade      String?         // "15W-40", "ISO 68", etc.
+  fluidCapacity   Float?          // Litros
+  
+  // Service intervals
+  serviceInterval Int?            // Horas/KM
+  lastService     DateTime?
+  nextService     DateTime?
+  
+  // Status
+  isActive        Boolean         @default(true)
+  
+  // Timestamps
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  
+  // Relações
+  samples         Sample[]
+  
+  @@unique([equipmentId, componentNo])
+  @@index([equipmentId])
+  @@map("components")
+}
+
+// ========================================
+// 🧪 SAMPLES (Amostras)
+// ========================================
+
+enum SampleStatus {
+  SUBMITTED       // Submetida pelo cliente
+  RECEIVED        // Recebida no lab
+  IN_PROGRESS     // Em análise
+  COMPLETED       // Análise completa
+  REPORTED        // Relatório enviado
+  ERROR           // Erro no processamento
+  CANCELLED       // Cancelada
+}
+
+enum SampleType {
+  ROUTINE         // Análise de rotina
+  RESAMPLE        // Re-amostragem
+  NEW_EQUIPMENT   // Equipamento novo
+  INVESTIGATION   // Investigação especial
+  POST_MAINTENANCE
+}
+
+enum SamplePriority {
+  NORMAL
+  HIGH
+  URGENT
+}
+
+model Sample {
+  id              String         @id @default(cuid())
+  
+  // Identificação
+  sampleNumber    String         @unique // WCK-2026-000001
+  batchId         String?        // Para amostras em lote
+  
+  // Cliente
+  customerId      String
+  customer        Customer       @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  
+  // Localização
+  siteId          String?
+  site            Site?          @relation(fields: [siteId], references: [id], onDelete: SetNull)
+  
+  // Equipment
+  equipmentId     String
+  equipment       Equipment      @relation(fields: [equipmentId], references: [id], onDelete: Restrict)
+  
+  componentId     String?
+  component       Component?     @relation(fields: [componentId], references: [id], onDelete: SetNull)
+  
+  // Tipo e Status
+  type            SampleType     @default(ROUTINE)
+  status          SampleStatus   @default(SUBMITTED)
+  priority        SamplePriority @default(NORMAL)
+  
+  // Leitura no momento da amostra
+  equipmentReading Float?
+  
+  // Fluid info
+  fluidType       String?
+  fluidGrade      String?
+  hoursSinceChange Float?        // Horas desde última troca
+  fluidAdded      Float?         // Litros adicionados
+  
+  // Lab info
+  receivedAt      DateTime?
+  analyzedAt      DateTime?
+  reportedAt      DateTime?
+  labTechnicianId String?
+  
+  // Comentários
+  customerComment String?        // Comentário do cliente na submissão
+  labComment      String?        // Comentário do lab
+  
+  // Submissão
+  submittedBy     String
+  submittedUser   User           @relation(fields: [submittedBy], references: [id])
+  
+  // Timestamps
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  
+  // Relações
+  testResults     TestResult[]
+  report          Report?
+  feedbacks       Feedback[]
+  
+  @@index([customerId])
+  @@index([equipmentId])
+  @@index([status])
+  @@index([batchId])
+  @@index([createdAt])
+  @@map("samples")
+}
+
+// ========================================
+// 🔬 TEST RESULTS (Resultados de Análises)
+// ========================================
+
+enum TestType {
+  SPECTROMETRIC   // Análise espectrométrica (metais)
+  VISCOSITY       // Viscosidade
+  TAN             // Total Acid Number
+  TBN             // Total Base Number
+  WATER_CONTENT   // Teor de água
+  FUEL_DILUTION   // Diluição de combustível
+  OXIDATION
+  NITRATION
+  SULFATION
+  GLYCOL
+  PARTICLE_COUNT  // Contagem de partículas
+  FERROUS_DENSITY // Densidade ferrosa
+  PQ_INDEX        // Particle Quantifier Index
+  FLASH_POINT
+  OTHER
+}
+
+enum Severity {
+  NORMAL          // Verde - OK
+  CAUTION         // Amarelo - Atenção
+  CRITICAL        // Vermelho - Crítico
+  SEVERE          // Roxo - Severo
+}
+
+model TestResult {
+  id              String     @id @default(cuid())
+  
+  sampleId        String
+  sample          Sample     @relation(fields: [sampleId], references: [id], onDelete: Cascade)
+  
+  // Teste
+  testType        TestType
+  testName        String     // Nome do teste
+  
+  // Resultado
+  value           Float?     // Valor numérico
+  unit            String?    // ppm, cSt, %, etc.
+  textResult      String?    // Resultado em texto (opcional)
+  
+  // Limites e Severidade
+  normalMin       Float?
+  normalMax       Float?
+  cautionMax      Float?
+  criticalMax     Float?
+  severity        Severity   @default(NORMAL)
+  
+  // Flags
+  outOfSpec       Boolean    @default(false)
+  trendUp         Boolean    @default(false)
+  trendDown       Boolean    @default(false)
+  
+  // Comentário do analista
+  comment         String?
+  
+  // Metadata
+  metadata        Json?
+  
+  createdAt       DateTime   @default(now())
+  
+  @@index([sampleId])
+  @@index([testType])
+  @@index([severity])
+  @@map("test_results")
+}
+
+// ========================================
+// 📊 REPORTS (Relatórios)
+// ========================================
+
+enum ReportStatus {
+  QUEUED          // Na fila
+  GENERATING      // Gerando PDF
+  READY           // Pronto para visualização
+  SENT            // Enviado por email
+  READ            // Lido pelo cliente
+  ARCHIVED        // Arquivado
+}
+
+model Report {
+  id              String       @id @default(cuid())
+  
+  // Sample
+  sampleId        String       @unique
+  sample          Sample       @relation(fields: [sampleId], references: [id], onDelete: Cascade)
+  
+  // Cliente
+  customerId      String
+  customer        Customer     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  
+  // Report details
+  reportNumber    String       @unique
+  reportDate      DateTime     @default(now()) // Data do relatório
+  status          ReportStatus @default(QUEUED)
+  
+  // PDF
+  pdfUrl          String?      // URL do PDF gerado
+  pdfPages        Int?         // 1 ou 2 páginas
+  pdfGeneratedAt  DateTime?
+  
+  // Comments and Analysis
+  diagnosticComment  String?   // Comentário de diagnóstico
+  laboratoryComment  String?   // Comentário do laboratório
+  
+  // Approval
+  approvedBy      String?      // Nome do analista
+  approvedAt      DateTime?    // Data de aprovação
+  
+  // Recomendações
+  recommendation  String?      // "Continue Sampling", "Resample", "Immediate Action"
+  problemType     String?      // Tipo de problema detectado
+  actionRequired  String?      // Ação recomendada
+  
+  // Resumo
+  summary         Json?        // Resumo estruturado dos resultados
+  
+  // Email tracking
+  emailSentAt     DateTime?
+  emailSentTo     String[]     @default([])
+  
+  // Visualização
+  readAt          DateTime?
+  readBy          String?
+  readByUser      User?        @relation(fields: [readBy], references: [id])
+  
+  // Timestamps
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  
+  // Relações
+  feedbacks       Feedback[]
+  
+  @@index([customerId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("reports")
+}
+
+// ========================================
+// 💬 FEEDBACK
+// ========================================
+
+enum FeedbackType {
+  REPORT_FEEDBACK
+  SAMPLE_FEEDBACK
+  GENERAL_FEEDBACK
+  COMPLAINT
+  SUGGESTION
+}
+
+enum FeedbackStatus {
+  PENDING
+  IN_REVIEW
+  RESOLVED
+  CLOSED
+}
+
+model Feedback {
+  id            String         @id @default(cuid())
+  
+  type          FeedbackType
+  status        FeedbackStatus @default(PENDING)
+  
+  // Conteúdo
+  subject       String?
+  message       String
+  rating        Int?           // 1-5 estrelas (opcional)
+  
+  // Referências
+  sampleId      String?
+  sample        Sample?        @relation(fields: [sampleId], references: [id], onDelete: SetNull)
+  
+  reportId      String?
+  report        Report?        @relation(fields: [reportId], references: [id], onDelete: SetNull)
+  
+  // Autor
+  userId        String
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Resposta
+  response      String?
+  respondedAt   DateTime?
+  respondedBy   String?
+  
+  // Timestamps
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  
+  @@index([userId])
+  @@index([status])
+  @@index([type])
+  @@map("feedbacks")
+}
+
+// ========================================
+// 🔔 NOTIFICATIONS
+// ========================================
+
+enum NotificationType {
+  SAMPLE_RECEIVED
+  REPORT_READY
+  CRITICAL_RESULT
+  SYSTEM_ALERT
+  FEEDBACK_RESPONSE
+  MAINTENANCE_DUE
+}
+
+enum NotificationChannel {
+  EMAIL
+  SMS
+  IN_APP
+  PUSH
+}
+
+model Notification {
+  id            String              @id @default(cuid())
+  
+  type          NotificationType
+  channel       NotificationChannel
+  
+  // Destinatário
+  userId        String
+  user          User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Conteúdo
+  title         String
+  message       String
+  data          Json?               // Dados adicionais
+  
+  // Links
+  actionUrl     String?
+  
+  // Status
+  sent          Boolean             @default(false)
+  sentAt        DateTime?
+  read          Boolean             @default(false)
+  readAt        DateTime?
+  
+  // Retry (para falhas de envio)
+  retryCount    Int                 @default(0)
+  
+  createdAt     DateTime            @default(now())
+  
+  @@index([userId])
+  @@index([read])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+// ========================================
+// 📝 AUDIT LOGS
+// ========================================
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  EXPORT
+  IMPORT
+  SEND_EMAIL
+  GENERATE_REPORT
+  CHANGE_STATUS
+}
+
+model AuditLog {
+  id            String      @id @default(cuid())
+  
+  // Quem
+  userId        String?
+  user          User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userEmail     String?     // Backup caso user seja deletado
+  
+  // O quê
+  action        AuditAction
+  entity        String      // "Sample", "Report", "User", etc.
+  entityId      String?
+  
+  // Detalhes
+  description   String
+  changes       Json?       // { before: {...}, after: {...} }
+  
+  // Contexto
+  ipAddress     String?
+  userAgent     String?
+  
+  createdAt     DateTime    @default(now())
+  
+  @@index([userId])
+  @@index([entity, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ========================================
+// 🏷️ LABELS (Etiquetas físicas)
+// ========================================
+
+enum LabelStatus {
+  CREATED
+  PRINTED
+  APPLIED
+  EXPIRED
+}
+
+model Label {
+  id              String      @id @default(cuid())
+  
+  // Identificação
+  labelCode       String      @unique  // QR Code / Barcode
+  
+  // Associação
+  equipmentId     String?
+  componentId     String?
+  
+  // Tipo
+  labelType       String      // "Equipment", "Component", "Sample Bottle"
+  
+  // Status
+  status          LabelStatus @default(CREATED)
+  
+  // Impressão
+  printedAt       DateTime?
+  printedBy       String?
+  
+  // Validade
+  expiresAt       DateTime?
+  
+  // Metadata
+  metadata        Json?
+  
+  createdAt       DateTime    @default(now())
+  
+  @@index([labelCode])
+  @@map("labels")
+}
+
+// ========================================
+// ⚙️ SYSTEM SETTINGS
+// ========================================
+
+model SystemSetting {
+  id            String   @id @default(cuid())
+  key           String   @unique
+  value         Json
+  description   String?
+  category      String   // "email", "pdf", "limits", "general"
+  
+  updatedAt     DateTime @updatedAt
+  updatedBy     String?
+  
+  @@index([category])
+  @@map("system_settings")
+}
