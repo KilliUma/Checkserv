@@ -196,6 +196,9 @@ pnpm lint             # Lint de todos os packages
 pnpm format           # Format código com Prettier
 pnpm type-check       # Verificar tipos TypeScript
 
+# Git
+pnpm git:auto -- "mensagem do commit"  # Add + commit + push automático
+
 # Limpeza
 pnpm clean            # Limpar todos os builds e node_modules
 ```
