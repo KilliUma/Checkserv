@@ -105,6 +105,15 @@ export async function POST(request: Request) {
     })
   } catch (error) {
     console.error('Erro no login:', error)
+
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    if (errorMessage.includes("Can't reach database server") || errorMessage.includes('P1001')) {
+      return NextResponse.json(
+        { error: 'Base de dados indisponivel. Inicie o PostgreSQL e tente novamente.' },
+        { status: 503 }
+      )
+    }
+
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
       { status: 500 }
