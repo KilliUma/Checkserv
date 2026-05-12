@@ -3,6 +3,8 @@ import { useNavigate, Link } from '@tanstack/react-router'
 import { User, Mail, Lock, Building, Phone, MapPin, FileText, ArrowRight, CheckCircle2, Smartphone, Eye, EyeOff } from 'lucide-react'
 import toast from 'react-hot-toast'
 
+const apiBaseUrl = import.meta.env.VITE_API_URL || ''
+
 export function Register() {
   const [formData, setFormData] = useState({
     name: '',
@@ -42,7 +44,7 @@ export function Register() {
     setIsLoading(true)
 
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch(`${apiBaseUrl}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

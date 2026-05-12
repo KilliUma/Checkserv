@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { Button } from '@wearcheck/ui'
 
 export default function Home() {
+  const clientPortalUrl = process.env.NEXT_PUBLIC_CLIENT_PORTAL_URL || 'http://localhost:3001'
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-100">
       {/* Header */}
@@ -16,7 +18,7 @@ export default function Home() {
                 <a href="#contacto" className="text-gray-700 hover:text-blue-600">Contacto</a>
               </div>
             </div>
-            <Link href="http://localhost:3001/login">
+            <Link href={`${clientPortalUrl}/login`}>
               <Button variant="primary">Portal do Cliente</Button>
             </Link>
           </div>

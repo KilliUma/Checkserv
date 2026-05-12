@@ -1,8 +1,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import axios from 'axios'
 import App from './App.tsx'
 import './index.css'
+
+axios.defaults.baseURL = import.meta.env.VITE_API_URL || ''
+axios.defaults.withCredentials = true
 
 const queryClient = new QueryClient({
   defaultOptions: {

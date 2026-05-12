@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { CheckCircle, Clock, Building, Mail, Phone, MapPin, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
+const apiBaseUrl = import.meta.env.VITE_API_URL || ''
+
 interface Customer {
   id: string
   name: string
@@ -29,7 +31,7 @@ export function PendingUsers() {
   const fetchPendingUsers = async () => {
     try {
       setLoading(true)
-      const response = await fetch('/api/users/pending', {
+      const response = await fetch(`${apiBaseUrl}/api/users/pending`, {
         credentials: 'include',
       })
 
@@ -54,7 +56,7 @@ export function PendingUsers() {
 
     try {
       setActivating(userId)
-      const response = await fetch(`/api/users/${userId}/activate`, {
+      const response = await fetch(`${apiBaseUrl}/api/users/${userId}/activate`, {
         method: 'POST',
         credentials: 'include',
       })

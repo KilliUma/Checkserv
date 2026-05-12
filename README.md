@@ -219,6 +219,7 @@ docker-compose down -v
 ## 📚 Documentação
 
 - [Guia de Desenvolvimento](./docs/DEVELOPMENT.md)
+- [Guia de Deploy na Vercel](./docs/VERCEL_DEPLOY.md)
 - [API Documentation](./docs/API.md)
 - [Database Schema](./docs/DATABASE.md)
 - [Deployment Guide](./docs/DEPLOYMENT.md)
