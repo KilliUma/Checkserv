@@ -7,6 +7,11 @@ if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   exit 1
 fi
 
+# O pnpm injeta "--" ao repassar argumentos para scripts.
+if [ "$1" = "--" ]; then
+  shift
+fi
+
 MESSAGE="$*"
 
 if [ -z "$MESSAGE" ]; then
