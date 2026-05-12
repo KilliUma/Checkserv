@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import axios from 'axios'
 
-const apiBaseUrl = (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3003' : '')).replace(/\/$/, '')
+const apiBaseUrl = (import.meta.env.DEV ? '' : (import.meta.env.VITE_API_URL || '')).replace(/\/$/, '')
 
 const api = axios.create({
   baseURL: `${apiBaseUrl}/api`,
@@ -30,7 +30,7 @@ interface AuthStore {
 
 export const useAuthStore = create<AuthStore>((set) => ({
   session: null,
-  isLoading: false,
+  isLoading: true,
   isAuthenticated: false,
 
   checkSession: async () => {

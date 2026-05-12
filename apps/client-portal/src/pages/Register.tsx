@@ -4,7 +4,7 @@ import { User, Mail, Lock, Building, Phone, MapPin, FileText, ArrowRight, CheckC
 import toast from 'react-hot-toast'
 import { withBasePath } from '../utils/basePath'
 
-const apiBaseUrl = (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3003' : '')).replace(/\/$/, '')
+const apiBaseUrl = (import.meta.env.DEV ? '' : (import.meta.env.VITE_API_URL || '')).replace(/\/$/, '')
 
 export function Register() {
   const [formData, setFormData] = useState({
