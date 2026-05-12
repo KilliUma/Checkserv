@@ -14,11 +14,7 @@ import { Sidebar } from './components/Sidebar'
 const queryClient = new QueryClient()
 
 function ProtectedLayout() {
-  const { isAuthenticated, isLoading, checkSession, session } = useAuthStore()
-
-  useEffect(() => {
-    checkSession()
-  }, [checkSession])
+  const { isAuthenticated, isLoading, session } = useAuthStore()
 
   if (isLoading) {
     return (
@@ -155,6 +151,12 @@ declare module '@tanstack/react-router' {
 }
 
 function App() {
+  const checkSession = useAuthStore((state) => state.checkSession)
+
+  useEffect(() => {
+    checkSession()
+  }, [checkSession])
+
   return (
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
