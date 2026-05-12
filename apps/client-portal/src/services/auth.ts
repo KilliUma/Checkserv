@@ -1,6 +1,7 @@
 import axios from 'axios'
+import { getApiBaseUrl } from '../utils/apiBaseUrl'
 
-const apiBaseUrl = (import.meta.env.DEV ? '' : (import.meta.env.VITE_API_URL || '')).replace(/\/$/, '')
+const apiBaseUrl = getApiBaseUrl()
 
 const api = axios.create({
   baseURL: `${apiBaseUrl}/api`,

@@ -4,8 +4,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import axios from 'axios'
 import App from './App.tsx'
 import './index.css'
+import { getApiBaseUrl } from './utils/apiBaseUrl'
 
-const apiBaseUrl = (import.meta.env.DEV ? '' : (import.meta.env.VITE_API_URL || '')).replace(/\/$/, '')
+const apiBaseUrl = getApiBaseUrl()
 
 axios.defaults.baseURL = apiBaseUrl
 axios.defaults.withCredentials = true

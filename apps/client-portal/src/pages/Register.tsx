@@ -3,8 +3,9 @@ import { useNavigate, Link } from '@tanstack/react-router'
 import { User, Mail, Lock, Building, Phone, MapPin, FileText, ArrowRight, CheckCircle2, Smartphone, Eye, EyeOff } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { withBasePath } from '../utils/basePath'
+import { getApiBaseUrl } from '../utils/apiBaseUrl'
 
-const apiBaseUrl = (import.meta.env.DEV ? '' : (import.meta.env.VITE_API_URL || '')).replace(/\/$/, '')
+const apiBaseUrl = getApiBaseUrl()
 
 export function Register() {
   const [formData, setFormData] = useState({
