@@ -400,18 +400,19 @@ importers:
 
   packages/pdf:
     dependencies:
-      canvas:
-        specifier: ^2.11.2
-        version: 2.11.2
-      chartjs-node-canvas:
-        specifier: ^4.1.6
-        version: 4.1.6(chart.js@3.9.1)
       date-fns:
         specifier: ^3.6.0
         version: 3.6.0
       pdfkit:
         specifier: ^0.15.0
         version: 0.15.2
+    optionalDependencies:
+      canvas:
+        specifier: ^2.11.2
+        version: 2.11.2
+      chartjs-node-canvas:
+        specifier: ^4.1.6
+        version: 4.1.6(chart.js@3.9.1)
     devDependencies:
       '@types/pdfkit':
         specifier: ^0.13.4
