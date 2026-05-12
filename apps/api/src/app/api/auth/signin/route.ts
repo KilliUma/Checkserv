@@ -4,14 +4,47 @@ import { prisma } from '@wearcheck/database'
 import { sign } from 'jsonwebtoken'
 import { cookies } from 'next/headers'
 
+function getCorsHeaders(request: Request): Record<string, string> {
+  const origin = request.headers.get('origin') || ''
+  const allowedOrigins = [
+    'http://localhost:3001',
+    'http://localhost:3002',
+    'http://localhost:3000',
+    'https://checkserv-client-portal.vercel.app',
+    'https://checkserv-backoffice.vercel.app',
+    'https://checkserv-web.vercel.app',
+  ]
+
+  if (!allowedOrigins.includes(origin)) {
+    return {}
+  }
+
+  return {
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Credentials': 'true',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+    Vary: 'Origin',
+  }
+}
+
+export async function OPTIONS(request: Request) {
+  return new NextResponse(null, {
+    status: 204,
+    headers: getCorsHeaders(request),
+  })
+}
+
 export async function POST(request: Request) {
+  const corsHeaders = getCorsHeaders(request)
+
   try {
     const { email, password } = await request.json()
 
     if (!email || !password) {
       return NextResponse.json(
         { error: 'Email e password são obrigatórios' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       )
     }
 
@@ -32,7 +65,7 @@ export async function POST(request: Request) {
     if (!user) {
       return NextResponse.json(
         { error: 'Credenciais inválidas' },
-        { status: 401 }
+        { status: 401, headers: corsHeaders }
       )
     }
 
@@ -44,7 +77,7 @@ export async function POST(request: Request) {
       
       return NextResponse.json(
         { error: message },
-        { status: 403 }
+        { status: 403, headers: corsHeaders }
       )
     }
 
@@ -52,7 +85,7 @@ export async function POST(request: Request) {
     if (user.customer && user.customer.status !== 'ACTIVE') {
       return NextResponse.json(
         { error: 'Conta da empresa inativa' },
-        { status: 403 }
+        { status: 403, headers: corsHeaders }
       )
     }
 
@@ -61,7 +94,7 @@ export async function POST(request: Request) {
     if (!isPasswordValid) {
       return NextResponse.json(
         { error: 'Credenciais inválidas' },
-        { status: 401 }
+        { status: 401, headers: corsHeaders }
       )
     }
 
@@ -102,7 +135,7 @@ export async function POST(request: Request) {
         role: user.role,
         customerId: user.customerId,
       },
-    })
+    }, { headers: corsHeaders })
   } catch (error) {
     console.error('Erro no login:', error)
 
@@ -110,13 +143,13 @@ export async function POST(request: Request) {
     if (errorMessage.includes("Can't reach database server") || errorMessage.includes('P1001')) {
       return NextResponse.json(
         { error: 'Base de dados indisponivel. Inicie o PostgreSQL e tente novamente.' },
-        { status: 503 }
+        { status: 503, headers: corsHeaders }
       )
     }
 
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     )
   }
 }

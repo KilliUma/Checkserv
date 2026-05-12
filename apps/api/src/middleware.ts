@@ -10,6 +10,9 @@ export async function middleware(request: NextRequest) {
     'http://localhost:3001',
     'http://localhost:3002',
     'http://localhost:3000',
+    'https://checkserv-client-portal.vercel.app',
+    'https://checkserv-backoffice.vercel.app',
+    'https://checkserv-web.vercel.app',
   ]
   
   const origin = request.headers.get('origin')
@@ -17,12 +20,13 @@ export async function middleware(request: NextRequest) {
     response.headers.set('Access-Control-Allow-Origin', origin)
     response.headers.set('Access-Control-Allow-Credentials', 'true')
     response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
+    response.headers.set('Vary', 'Origin')
   }
 
   // Handle preflight
   if (request.method === 'OPTIONS') {
-    return response
+    return new NextResponse(null, { status: 204, headers: response.headers })
   }
 
   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
