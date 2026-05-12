@@ -104,3 +104,57 @@ Para cPanel em subpasta use VITE_BASE_PATH=/checkserv/
 - Os apps Vite já usam VITE_API_URL para comunicação com a API.
 - Se houver bloqueio de autenticação por cookies entre domínios, valide CORS e política de cookies no backend.
 - **Canvas e gráficos**: O pacote `canvas` é opcional na Vercel. Se a geração de gráficos em PDFs falhar, é porque a compilação nativa não conseguiu em ambiente Linux. Isso não afeta o funcionamento da API, apenas a renderização de gráficos complexos em relatórios. A API continua a funcionar normalmente.
+
+## 7) Deploy mais rápido (otimização)
+
+Para reduzir tempo de build e evitar builds desnecessários, configure cada projeto separadamente na Vercel.
+
+### API (apps/api)
+
+- Root Directory: `apps/api`
+- Install Command: `pnpm install --frozen-lockfile`
+- Build Command: `pnpm run build`
+- Node.js Version: `20.x`
+
+Se o log mostrar `turbo run build` para o projeto da API, o Build Command está herdando do root do monorepo e ficará mais lento.
+
+### Site (apps/web)
+
+- Root Directory: `apps/web`
+- Install Command: `pnpm install --frozen-lockfile`
+- Build Command: `pnpm run build`
+- Node.js Version: `20.x`
+
+### Sistema (apps/backoffice)
+
+- Root Directory: `apps/backoffice`
+- Install Command: `pnpm install --frozen-lockfile`
+- Build Command: `pnpm run build`
+- Node.js Version: `20.x`
+
+### Ignored Build Step (recomendado)
+
+Use para evitar deploy quando não houver alteração relevante no projeto.
+
+API:
+
+```bash
+git diff --quiet HEAD^ HEAD -- apps/api packages/database packages/auth packages/types packages/pdf && exit 0 || exit 1
+```
+
+Site:
+
+```bash
+git diff --quiet HEAD^ HEAD -- apps/web packages/ui packages/types && exit 0 || exit 1
+```
+
+Backoffice:
+
+```bash
+git diff --quiet HEAD^ HEAD -- apps/backoffice packages/ui packages/types && exit 0 || exit 1
+```
+
+### Cache: quando limpar
+
+- Use **Redeploy sem limpar cache** para deploy normal (mais rápido).
+- Use **Clear build cache** apenas quando houver erro estranho de lockfile, dependência ou comportamento inconsistente.
