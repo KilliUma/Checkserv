@@ -3,56 +3,17 @@ import { compare } from 'bcryptjs'
 import { prisma } from '@wearcheck/database'
 import { sign } from 'jsonwebtoken'
 import { cookies } from 'next/headers'
-
-function isAllowedOrigin(origin: string): boolean {
-  if (!origin) {
-    return false
-  }
-
-  const exactOrigins = [
-    'http://localhost:3001',
-    'http://localhost:3002',
-    'http://localhost:3000',
-    'https://checkserv-client-portal.vercel.app',
-    'https://checkserv-backoffice.vercel.app',
-    'https://checkserv-web.vercel.app',
-  ]
-
-  if (exactOrigins.includes(origin)) {
-    return true
-  }
-
-  const vercelPreviewPattern =
-    /^https:\/\/checkserv-(client-portal|backoffice|web)(-[a-z0-9-]+)?\.vercel\.app$/i
-
-  return vercelPreviewPattern.test(origin)
-}
-
-function getCorsHeaders(request: Request): Record<string, string> {
-  const origin = request.headers.get('origin') || ''
-
-  if (!isAllowedOrigin(origin)) {
-    return {}
-  }
-
-  return {
-    'Access-Control-Allow-Origin': origin,
-    'Access-Control-Allow-Credentials': 'true',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
-    Vary: 'Origin',
-  }
-}
+import { getCorsHeaders } from '@/lib/cors'
 
 export async function OPTIONS(request: Request) {
   return new NextResponse(null, {
     status: 204,
-    headers: getCorsHeaders(request),
+    headers: getCorsHeaders(request.headers.get('origin')),
   })
 }
 
 export async function POST(request: Request) {
-  const corsHeaders = getCorsHeaders(request)
+  const corsHeaders = getCorsHeaders(request.headers.get('origin'))
 
   try {
     const { email, password } = await request.json()
