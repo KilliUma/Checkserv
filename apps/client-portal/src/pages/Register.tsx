@@ -3,7 +3,7 @@ import { useNavigate, Link } from '@tanstack/react-router'
 import { User, Mail, Lock, Building, Phone, MapPin, FileText, ArrowRight, CheckCircle2, Smartphone, Eye, EyeOff } from 'lucide-react'
 import toast from 'react-hot-toast'
 
-const apiBaseUrl = import.meta.env.VITE_API_URL || ''
+const apiBaseUrl = (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3003' : '')).replace(/\/$/, '')
 
 export function Register() {
   const [formData, setFormData] = useState({

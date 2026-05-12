@@ -5,7 +5,9 @@ import axios from 'axios'
 import App from './App.tsx'
 import './index.css'
 
-axios.defaults.baseURL = import.meta.env.VITE_API_URL || ''
+const apiBaseUrl = (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3003' : '')).replace(/\/$/, '')
+
+axios.defaults.baseURL = apiBaseUrl
 axios.defaults.withCredentials = true
 
 const queryClient = new QueryClient({
