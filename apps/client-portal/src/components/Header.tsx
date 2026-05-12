@@ -193,7 +193,7 @@ export function Header() {
                     <ChevronDown size={14} className={`transition-transform ${openDropdown === 'user' ? 'rotate-180' : ''}`} />
                   </button>
                   {openDropdown === 'user' && (
-                    <div className="absolute top-full right-0 mt-2 bg-white shadow-xl rounded-lg py-2 min-w-[200px] z-50 border border-gray-100 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="absolute top-full right-0 mt-0 bg-white shadow-xl rounded-lg py-2 min-w-[200px] z-50 border border-gray-100 animate-in fade-in slide-in-from-top-2 duration-200">
                       <div className="px-5 py-2.5 border-b border-gray-100">
                         <p className="text-xs text-gray-500">Logado como</p>
                         <p className="text-sm font-semibold text-gray-900 truncate">{session?.user?.email}</p>
@@ -235,7 +235,7 @@ export function Header() {
                     {t('header.about')} <ChevronDown size={14} className={`transition-transform ${openDropdown === 'about' ? 'rotate-180' : ''}`} />
                   </button>
                   {openDropdown === 'about' && (
-                    <div className="absolute top-full left-0 mt-2 bg-white shadow-xl rounded-lg py-2 min-w-[220px] z-50 border border-gray-100 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="absolute top-full left-0 mt-0 bg-white shadow-xl rounded-lg py-2 min-w-[220px] z-50 border border-gray-100 animate-in fade-in slide-in-from-top-2 duration-200">
                       <a href="#" className="block px-5 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">{t('header.aboutCompany')}</a>
                       <a href="#" className="block px-5 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">{t('header.aboutPeople')}</a>
                       <a href="#" className="block px-5 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">{t('header.accreditations')}</a>
@@ -253,7 +253,7 @@ export function Header() {
                     {t('header.services')} <ChevronDown size={14} className={`transition-transform ${openDropdown === 'services' ? 'rotate-180' : ''}`} />
                   </button>
                   {openDropdown === 'services' && (
-                    <div className="absolute top-full left-0 mt-2 bg-white shadow-xl rounded-lg py-2 min-w-[240px] z-50 border border-gray-100 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="absolute top-full left-0 mt-0 bg-white shadow-xl rounded-lg py-2 min-w-[240px] z-50 border border-gray-100 animate-in fade-in slide-in-from-top-2 duration-200">
                       <a href="#" className="block px-5 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">{t('header.servicesAnalysis')}</a>
                       <a href="#" className="block px-5 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">{t('header.servicesReliability')}</a>
                       <a href="#" className="block px-5 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">{t('header.servicesLubricant')}</a>
@@ -271,7 +271,7 @@ export function Header() {
                     {t('header.training')} <ChevronDown size={14} className={`transition-transform ${openDropdown === 'training' ? 'rotate-180' : ''}`} />
                   </button>
                   {openDropdown === 'training' && (
-                    <div className="absolute top-full left-0 mt-2 bg-white shadow-xl rounded-lg py-2 min-w-[220px] z-50 border border-gray-100 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="absolute top-full left-0 mt-0 bg-white shadow-xl rounded-lg py-2 min-w-[220px] z-50 border border-gray-100 animate-in fade-in slide-in-from-top-2 duration-200">
                       <a href="#" className="block px-5 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">{t('header.trainingCourses')}</a>
                       <a href="#" className="block px-5 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">{t('header.trainingSchedule')}</a>
                       <a href="#" className="block px-5 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">{t('header.trainingRegister')}</a>
@@ -293,7 +293,7 @@ export function Header() {
                     {t('header.info')} <ChevronDown size={14} className={`transition-transform ${openDropdown === 'info' ? 'rotate-180' : ''}`} />
                   </button>
                   {openDropdown === 'info' && (
-                    <div className="absolute top-full left-0 mt-2 bg-white shadow-xl rounded-lg py-2 min-w-[220px] z-50 border border-gray-100 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="absolute top-full left-0 mt-0 bg-white shadow-xl rounded-lg py-2 min-w-[220px] z-50 border border-gray-100 animate-in fade-in slide-in-from-top-2 duration-200">
                       <a href="#" className="block px-5 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">{t('header.infoResources')}</a>
                       <a href="#" className="block px-5 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">{t('header.infoDownloads')}</a>
                       <a href="#" className="block px-5 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">{t('header.infoFaqs')}</a>
@@ -315,7 +315,7 @@ export function Header() {
                     {t('header.contacts')} <ChevronDown size={14} className={`transition-transform ${openDropdown === 'contacts' ? 'rotate-180' : ''}`} />
                   </button>
                   {openDropdown === 'contacts' && (
-                    <div className="absolute top-full left-0 mt-2 bg-white shadow-xl rounded-lg py-2 min-w-[220px] z-50 border border-gray-100 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="absolute top-full left-0 mt-0 bg-white shadow-xl rounded-lg py-2 min-w-[220px] z-50 border border-gray-100 animate-in fade-in slide-in-from-top-2 duration-200">
                       <a href="#" className="block px-5 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">{t('header.contactsUs')}</a>
                       <a href="#" className="block px-5 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">{t('header.contactsLocations')}</a>
                       <a href="#" className="block px-5 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">{t('header.contactsSupport')}</a>
