@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { withBasePath } from '../utils/basePath';
 
 declare global {
   interface Window {
@@ -26,12 +27,12 @@ export function PannellumViewer({
     // Carregar o CSS do Pannellum
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = '/checkserv/pannellum.css';
+    link.href = withBasePath('/pannellum.css');
     document.head.appendChild(link);
     
     // Carregar o script do Pannellum dinamicamente
     const script = document.createElement('script');
-    script.src = '/checkserv/pannellum.js';
+    script.src = withBasePath('/pannellum.js');
     script.async = true;
     
     script.onload = () => {

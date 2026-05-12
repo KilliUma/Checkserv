@@ -3,6 +3,7 @@ import { useNavigate, Link } from '@tanstack/react-router'
 import { Lock, Mail, ArrowRight, Shield, Zap, BarChart3, Eye, EyeOff } from 'lucide-react'
 import { useAuthStore } from '../stores/authStore'
 import toast from 'react-hot-toast'
+import { withBasePath } from '../utils/basePath'
 
 export function Login() {
   const [email, setEmail] = useState('')
@@ -33,9 +34,9 @@ export function Login() {
       <div className="absolute top-0 left-0 right-0 z-10">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <a href="/checkserv/">
+            <a href={withBasePath('/')}>
               <img 
-                src="/checkserv/wearcheck-logo.png"
+                src={withBasePath('/wearcheck-logo.png')}
                 alt="CheckServ" 
                 className="h-12 w-auto object-contain"
               />

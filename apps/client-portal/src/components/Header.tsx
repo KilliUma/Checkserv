@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useLanguage } from '../contexts/LanguageContext'
 import { useAuthStore } from '../stores/authStore'
 import { useNavigate } from '@tanstack/react-router'
+import { withBasePath } from '../utils/basePath'
 
 export function Header() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -119,9 +120,9 @@ export function Header() {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <div className="flex items-center">
-            <a href="/checkserv/">
+            <a href={withBasePath('/')}>
               <img 
-                src={isScrolled ? "/checkserv/wearcheck-logo.png" : "/checkserv/checkserv.png"}
+                src={isScrolled ? withBasePath('/wearcheck-logo.png') : withBasePath('/checkserv.png')}
                 alt="CheckServ - Condition Monitoring Specialists" 
                 className="h-16 w-48 object-contain cursor-pointer transition-all duration-300"
               />
@@ -133,7 +134,7 @@ export function Header() {
             {isAuthenticated ? (
               /* Authenticated Client Navigation */
               <>
-                <a href="/checkserv/dashboard" className={`px-4 py-2 text-sm font-semibold transition relative group ${
+                <a href={withBasePath('/dashboard')} className={`px-4 py-2 text-sm font-semibold transition relative group ${
                   isScrolled ? 'text-gray-700 hover:text-red-600' : 'text-white hover:text-red-400'
                 }`}>
                   Dashboard
@@ -142,7 +143,7 @@ export function Header() {
                   }`}></span>
                 </a>
                 
-                <a href="/checkserv/amostras" className={`px-4 py-2 text-sm font-semibold transition relative group ${
+                <a href={withBasePath('/amostras')} className={`px-4 py-2 text-sm font-semibold transition relative group ${
                   isScrolled ? 'text-gray-700 hover:text-red-600' : 'text-white hover:text-red-400'
                 }`}>
                   Amostras
@@ -151,7 +152,7 @@ export function Header() {
                   }`}></span>
                 </a>
                 
-                <a href="/checkserv/relatorios" className={`px-4 py-2 text-sm font-semibold transition relative group ${
+                <a href={withBasePath('/relatorios')} className={`px-4 py-2 text-sm font-semibold transition relative group ${
                   isScrolled ? 'text-gray-700 hover:text-red-600' : 'text-white hover:text-red-400'
                 }`}>
                   Relatórios
@@ -160,7 +161,7 @@ export function Header() {
                   }`}></span>
                 </a>
                 
-                <a href="/checkserv/equipamentos" className={`px-4 py-2 text-sm font-semibold transition relative group ${
+                <a href={withBasePath('/equipamentos')} className={`px-4 py-2 text-sm font-semibold transition relative group ${
                   isScrolled ? 'text-gray-700 hover:text-red-600' : 'text-white hover:text-red-400'
                 }`}>
                   Equipamentos
@@ -169,7 +170,7 @@ export function Header() {
                   }`}></span>
                 </a>
                 
-                <a href="/checkserv/configuracoes" className={`px-4 py-2 text-sm font-semibold transition relative group ${
+                <a href={withBasePath('/configuracoes')} className={`px-4 py-2 text-sm font-semibold transition relative group ${
                   isScrolled ? 'text-gray-700 hover:text-red-600' : 'text-white hover:text-red-400'
                 }`}>
                   Configurações
@@ -197,7 +198,7 @@ export function Header() {
                         <p className="text-xs text-gray-500">Logado como</p>
                         <p className="text-sm font-semibold text-gray-900 truncate">{session?.user?.email}</p>
                       </div>
-                      <a href="/checkserv/" className="flex items-center gap-2 px-5 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">
+                      <a href={withBasePath('/')} className="flex items-center gap-2 px-5 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">
                         <User size={16} />
                         Meu Perfil
                       </a>
@@ -215,7 +216,7 @@ export function Header() {
             ) : (
               /* Public Website Navigation */
               <>
-                <a href="/checkserv/" className={`px-3 py-2 text-sm font-medium transition relative group ${
+                <a href={withBasePath('/')} className={`px-3 py-2 text-sm font-medium transition relative group ${
                   isScrolled ? 'text-red-600 hover:text-red-700' : 'text-white hover:text-red-400'
                 }`}>
                   {t('header.home')}
@@ -323,7 +324,7 @@ export function Header() {
                 </div>
                 
                 <a 
-                  href="/checkserv/login" 
+                  href={withBasePath('/login')} 
                   className={`ml-4 px-6 py-2.5 rounded-full text-sm font-semibold transition shadow-md hover:shadow-lg ${
                     isScrolled 
                       ? 'bg-red-600 text-white hover:bg-red-700' 

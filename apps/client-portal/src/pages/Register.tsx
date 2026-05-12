@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from '@tanstack/react-router'
 import { User, Mail, Lock, Building, Phone, MapPin, FileText, ArrowRight, CheckCircle2, Smartphone, Eye, EyeOff } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { withBasePath } from '../utils/basePath'
 
 const apiBaseUrl = (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3003' : '')).replace(/\/$/, '')
 
@@ -85,9 +86,9 @@ export function Register() {
       <div className="absolute top-0 left-0 right-0 z-10">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <a href="/checkserv/">
+            <a href={withBasePath('/')}>
               <img 
-                src="/checkserv/wearcheck-logo.png"
+                src={withBasePath('/wearcheck-logo.png')}
                 alt="CheckServ" 
                 className="h-12 w-auto object-contain"
               />

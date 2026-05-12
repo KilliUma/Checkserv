@@ -14,6 +14,7 @@ import { Header } from './components/Header'
 import { Footer } from './components/Footer'
 import { LanguageProvider } from './contexts/LanguageContext'
 import { useAuthStore } from './stores/authStore'
+import { routerBasePath, withBasePath } from './utils/basePath'
 
 const queryClient = new QueryClient()
 
@@ -45,7 +46,7 @@ function ProtectedLayout() {
   }
 
   if (!isAuthenticated) {
-    window.location.href = '/checkserv/login'
+    window.location.href = withBasePath('/login')
     return null
   }
 
@@ -63,7 +64,7 @@ function NotFound() {
         <h1 className="text-4xl font-bold text-gray-800 mb-4">404</h1>
         <p className="text-xl text-gray-600 mb-8">Página não encontrada</p>
         <a 
-          href="/checkserv/" 
+          href={withBasePath('/')} 
           className="px-6 py-3 bg-wearcheck-blue text-white rounded-lg hover:bg-blue-800 transition"
         >
           Voltar ao Dashboard
@@ -143,7 +144,7 @@ const routeTree = rootRoute.addChildren([
 
 const router = new Router({ 
   routeTree,
-  basepath: '/checkserv'
+  basepath: routerBasePath
 })
 
 declare module '@tanstack/react-router' {

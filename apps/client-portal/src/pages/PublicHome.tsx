@@ -3,6 +3,7 @@ import { PannellumViewer } from '../components/PannellumViewer'
 import { useState, useEffect } from 'react'
 import { useScrollAnimation } from '../hooks/useScrollAnimation'
 import { useLanguage } from '../contexts/LanguageContext'
+import { withBasePath } from '../utils/basePath'
 
 export function PublicHome() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -73,21 +74,21 @@ export function PublicHome() {
         <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-red-950 transition-all duration-1000">
           {slides[currentSlide].image === "heart" && (
             <div className="absolute inset-0" style={{
-              backgroundImage: 'url(/checkserv/pilot-cockpit.jpg)',
+              backgroundImage: `url(${withBasePath('/pilot-cockpit.jpg')})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center'
             }}></div>
           )}
           {slides[currentSlide].image === "water" && (
             <div className="absolute inset-0" style={{
-              backgroundImage: 'url(/checkserv/thumbs-002.jpg)',
+              backgroundImage: `url(${withBasePath('/thumbs-002.jpg')})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center'
             }}></div>
           )}
           {slides[currentSlide].image === "oil" && (
             <div className="absolute inset-0" style={{
-              backgroundImage: 'url(/checkserv/thumbs-003.jpg)',
+              backgroundImage: `url(${withBasePath('/thumbs-003.jpg')})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center'
             }}></div>
