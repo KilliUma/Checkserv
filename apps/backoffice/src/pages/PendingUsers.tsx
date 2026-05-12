@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { CheckCircle, Clock, Building, Mail, Phone, MapPin, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
-const apiBaseUrl = import.meta.env.VITE_API_URL || ''
+const apiBaseUrl = (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3003' : '')).replace(/\/$/, '')
 
 interface Customer {
   id: string
