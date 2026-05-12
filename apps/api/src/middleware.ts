@@ -2,11 +2,12 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 
-export async function middleware(request: NextRequest) {
-  // CORS headers
-  const response = NextResponse.next()
-  
-  const allowedOrigins = [
+function isAllowedOrigin(origin: string): boolean {
+  if (!origin) {
+    return false
+  }
+
+  const exactOrigins = [
     'http://localhost:3001',
     'http://localhost:3002',
     'http://localhost:3000',
@@ -14,9 +15,23 @@ export async function middleware(request: NextRequest) {
     'https://checkserv-backoffice.vercel.app',
     'https://checkserv-web.vercel.app',
   ]
+
+  if (exactOrigins.includes(origin)) {
+    return true
+  }
+
+  const vercelPreviewPattern =
+    /^https:\/\/checkserv-(client-portal|backoffice|web)(-[a-z0-9-]+)?\.vercel\.app$/i
+
+  return vercelPreviewPattern.test(origin)
+}
+
+export async function middleware(request: NextRequest) {
+  // CORS headers
+  const response = NextResponse.next()
   
   const origin = request.headers.get('origin')
-  if (origin && allowedOrigins.includes(origin)) {
+  if (origin && isAllowedOrigin(origin)) {
     response.headers.set('Access-Control-Allow-Origin', origin)
     response.headers.set('Access-Control-Allow-Credentials', 'true')
     response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')

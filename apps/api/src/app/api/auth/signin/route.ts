@@ -4,9 +4,12 @@ import { prisma } from '@wearcheck/database'
 import { sign } from 'jsonwebtoken'
 import { cookies } from 'next/headers'
 
-function getCorsHeaders(request: Request): Record<string, string> {
-  const origin = request.headers.get('origin') || ''
-  const allowedOrigins = [
+function isAllowedOrigin(origin: string): boolean {
+  if (!origin) {
+    return false
+  }
+
+  const exactOrigins = [
     'http://localhost:3001',
     'http://localhost:3002',
     'http://localhost:3000',
@@ -15,7 +18,20 @@ function getCorsHeaders(request: Request): Record<string, string> {
     'https://checkserv-web.vercel.app',
   ]
 
-  if (!allowedOrigins.includes(origin)) {
+  if (exactOrigins.includes(origin)) {
+    return true
+  }
+
+  const vercelPreviewPattern =
+    /^https:\/\/checkserv-(client-portal|backoffice|web)(-[a-z0-9-]+)?\.vercel\.app$/i
+
+  return vercelPreviewPattern.test(origin)
+}
+
+function getCorsHeaders(request: Request): Record<string, string> {
+  const origin = request.headers.get('origin') || ''
+
+  if (!isAllowedOrigin(origin)) {
     return {}
   }
 
