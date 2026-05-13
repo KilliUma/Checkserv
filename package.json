@@ -32,6 +32,15 @@
     "packages/*"
   ],
   "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "canvas",
+      "core-js-pure",
+      "esbuild",
+      "prisma",
+      "unrs-resolver"
+    ],
     "overrides": {
       "eslint": "^8.57.0"
     }
