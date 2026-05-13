@@ -67,9 +67,15 @@ export const useAuthStore = create<AuthStore>((set) => ({
     if (response.data.error) {
       throw new Error(response.data.error)
     }
+
+    // Confirma persistencia da sessao via cookie antes de marcar login como concluido.
+    const { data: sessionData } = await api.get('/auth/session')
+    if (!sessionData?.user) {
+      throw new Error('Sessao nao persistida no navegador')
+    }
     
     set({ 
-      session: response.data, 
+      session: sessionData,
       isAuthenticated: true,
       isLoading: false 
     })
