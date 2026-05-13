@@ -1,13 +1,11 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@wearcheck/auth'
 import { prisma } from '@wearcheck/database'
+import { getAuthTokenPayload } from '../../../../lib/auth'
 
 export async function GET(request: Request) {
   try {
-    const session = await getServerSession(authOptions)
-    
-    if (!session || !session.user) {
+    const decoded = getAuthTokenPayload()
+    if (!decoded) {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
     }
 
@@ -22,9 +20,11 @@ export async function GET(request: Request) {
     const skip = (page - 1) * limit
 
     const where: any = {
-      sample: {
-        customerId: (session.user as any).customerId,
-      },
+      sample: {},
+    }
+
+    if (decoded.customerId) {
+      where.sample.customerId = decoded.customerId
     }
 
     if (status) {

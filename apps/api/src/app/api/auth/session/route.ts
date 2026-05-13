@@ -1,19 +1,14 @@
 import { NextResponse } from 'next/server'
-import { verify } from 'jsonwebtoken'
-import { cookies } from 'next/headers'
 import { prisma } from '@wearcheck/database'
+import { getAuthTokenPayload } from '../../../../lib/auth'
 
 export async function GET() {
   try {
-    const cookieStore = cookies()
-    const token = cookieStore.get('auth-token')
+    const decoded = getAuthTokenPayload()
 
-    if (!token) {
+    if (!decoded) {
       return NextResponse.json(null, { status: 401 })
     }
-
-    // Verificar token
-    const decoded = verify(token.value, process.env.NEXTAUTH_SECRET || 'secret') as any
 
     // Buscar usuário atualizado
     const user = await prisma.user.findUnique({

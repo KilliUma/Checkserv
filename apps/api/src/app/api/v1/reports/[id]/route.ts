@@ -1,26 +1,28 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@wearcheck/auth'
 import { prisma } from '@wearcheck/database'
+import { getAuthTokenPayload } from '../../../../../lib/auth'
 
 export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions)
-    
-    if (!session || !session.user) {
+    const decoded = getAuthTokenPayload()
+    if (!decoded) {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
     }
 
+    const reportWhere: any = {
+      id: params.id,
+      sample: {},
+    }
+
+    if (decoded.customerId) {
+      reportWhere.sample.customerId = decoded.customerId
+    }
+
     const report = await prisma.report.findFirst({
-      where: {
-        id: params.id,
-        sample: {
-          customerId: (session.user as any).customerId,
-        },
-      },
+      where: reportWhere,
       include: {
         sample: {
           include: {

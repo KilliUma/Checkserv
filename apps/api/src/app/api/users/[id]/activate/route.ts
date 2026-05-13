@@ -1,25 +1,19 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@wearcheck/database'
-import { verify } from 'jsonwebtoken'
-import { cookies } from 'next/headers'
+import { getAuthTokenPayload, isAdminRole } from '../../../../../lib/auth'
 
 export async function POST(
   request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    // Verificar autenticação
-    const cookieStore = cookies()
-    const token = cookieStore.get('auth-token')?.value
-
-    if (!token) {
+    const decoded = getAuthTokenPayload()
+    if (!decoded) {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
     }
 
-    const decoded = verify(token, process.env.NEXTAUTH_SECRET || 'secret') as any
-
     // Verificar se é admin
-    if (decoded.role !== 'SUPER_ADMIN' && decoded.role !== 'ADMIN') {
+    if (!isAdminRole(decoded.role)) {
       return NextResponse.json({ error: 'Sem permissão' }, { status: 403 })
     }
 

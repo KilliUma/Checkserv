@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Button } from '@wearcheck/ui'
 
 export default function Home() {
-  const clientPortalUrl = process.env.NEXT_PUBLIC_CLIENT_PORTAL_URL || 'http://localhost:3001'
+  const clientPortalUrl = process.env.NEXT_PUBLIC_CLIENT_PORTAL_URL || 'http://localhost:3101'
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-100">

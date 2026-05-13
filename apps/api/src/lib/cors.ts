@@ -1,7 +1,7 @@
 const DEFAULT_ALLOWED_ORIGINS = [
-  'http://localhost:3000',
-  'http://localhost:3001',
-  'http://localhost:3002',
+  'http://localhost:3100',
+  'http://localhost:3101',
+  'http://localhost:3102',
   'https://checkserv-client-portal.vercel.app',
   'https://checkserv-backoffice.vercel.app',
   'https://checkserv-web.vercel.app',

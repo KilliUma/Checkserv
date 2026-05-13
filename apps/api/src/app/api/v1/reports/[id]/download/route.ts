@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@wearcheck/auth'
 import { prisma } from '@wearcheck/database'
+import { getAuthTokenPayload } from '../../../../../../lib/auth'
 // import { generatePdfReport, type ReportData } from '@wearcheck/pdf'
 
 export async function GET(
@@ -9,9 +8,8 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions)
-    
-    if (!session) {
+    const decoded = getAuthTokenPayload()
+    if (!decoded) {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
     }
 
