@@ -5,6 +5,10 @@ import { sign } from 'jsonwebtoken'
 import { cookies } from 'next/headers'
 import { getCorsHeaders } from '@/lib/cors'
 
+function hasSupportedBcryptHash(passwordHash: string): boolean {
+  return /^\$2[aby]\$\d{2}\$/.test(passwordHash)
+}
+
 export async function OPTIONS(request: Request) {
   return new NextResponse(null, {
     status: 204,
@@ -67,6 +71,15 @@ export async function POST(request: Request) {
     }
 
     // Verificar password
+    if (!user.password || !hasSupportedBcryptHash(user.password)) {
+      console.error('Hash de password invalido para utilizador', { userId: user.id })
+
+      return NextResponse.json(
+        { error: 'Credenciais inválidas' },
+        { status: 401, headers: corsHeaders }
+      )
+    }
+
     const isPasswordValid = await compare(password, user.password)
     if (!isPasswordValid) {
       return NextResponse.json(
@@ -94,7 +107,7 @@ export async function POST(request: Request) {
     )
 
     // Definir cookie
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     cookieStore.set('auth-token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
