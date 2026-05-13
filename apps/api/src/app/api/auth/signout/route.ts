@@ -4,7 +4,15 @@ import { cookies } from 'next/headers'
 export async function POST() {
   try {
     const cookieStore = cookies()
-    cookieStore.delete('auth-token')
+    const isProduction = process.env.NODE_ENV === 'production'
+
+    cookieStore.set('auth-token', '', {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
+      maxAge: 0,
+      path: '/',
+    })
 
     return NextResponse.json({ success: true })
   } catch (error) {

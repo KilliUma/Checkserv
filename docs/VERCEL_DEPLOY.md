@@ -105,6 +105,17 @@ Para cPanel em subpasta use VITE_BASE_PATH=/checkserv/
 - Se houver bloqueio de autenticação por cookies entre domínios, valide CORS e política de cookies no backend.
 - **Canvas e gráficos**: O pacote `canvas` é opcional na Vercel. Se a geração de gráficos em PDFs falhar, é porque a compilação nativa não conseguiu em ambiente Linux. Isso não afeta o funcionamento da API, apenas a renderização de gráficos complexos em relatórios. A API continua a funcionar normalmente.
 
+### Fail-fast de variáveis na API
+
+O app `apps/api` valida automaticamente variáveis obrigatórias antes de `build` e `start` em ambiente de deploy (`VERCEL_ENV=production|preview` ou `NODE_ENV=production`):
+
+- `DATABASE_URL`
+- `DIRECT_URL`
+- `NEXTAUTH_SECRET`
+- `NEXTAUTH_URL`
+
+Se alguma estiver ausente, o build falha com mensagem clara para evitar deploy bem-sucedido com erro 500 em runtime.
+
 ## 7) Deploy mais rápido (otimização)
 
 Para reduzir tempo de build e evitar builds desnecessários, configure cada projeto separadamente na Vercel.

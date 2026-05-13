@@ -4,7 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3103",
+    "check:env": "node ./scripts/check-required-env.mjs",
+    "prebuild": "pnpm run check:env",
     "build": "next build",
+    "prestart": "pnpm run check:env",
     "start": "next start -p 3103",
     "lint": "next lint",
     "type-check": "tsc --noEmit"

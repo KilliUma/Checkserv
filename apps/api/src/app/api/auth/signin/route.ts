@@ -108,10 +108,12 @@ export async function POST(request: Request) {
 
     // Definir cookie
     const cookieStore = await cookies()
+    const isProduction = process.env.NODE_ENV === 'production'
+
     cookieStore.set('auth-token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60, // 7 dias
       path: '/',
     })
