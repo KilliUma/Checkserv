@@ -113,8 +113,30 @@ export async function POST(request: Request) {
       code: error.code,
       meta: error.meta,
     })
+
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    if (
+      errorMessage.includes('Environment variable not found: DATABASE_URL') ||
+      errorMessage.includes('Environment variable not found: DIRECT_URL')
+    ) {
+      return NextResponse.json(
+        {
+          error: 'Configuração do servidor incompleta. Contacte o suporte.',
+          code: 'SERVER_MISCONFIGURATION',
+        },
+        { status: 500 }
+      )
+    }
+
+    if (errorMessage.includes("Can't reach database server") || errorMessage.includes('P1001')) {
+      return NextResponse.json(
+        { error: 'Base de dados indisponivel. Tente novamente em instantes.' },
+        { status: 503 }
+      )
+    }
+
     return NextResponse.json(
-      { error: `Erro ao criar conta: ${error.message || 'Tente novamente.'}` },
+      { error: 'Erro interno do servidor' },
       { status: 500 }
     )
   }

@@ -130,6 +130,19 @@ export async function POST(request: Request) {
     console.error('Erro no login:', error)
 
     const errorMessage = error instanceof Error ? error.message : String(error)
+    if (
+      errorMessage.includes('Environment variable not found: DATABASE_URL') ||
+      errorMessage.includes('Environment variable not found: DIRECT_URL')
+    ) {
+      return NextResponse.json(
+        {
+          error: 'Configuração do servidor incompleta. Contacte o suporte.',
+          code: 'SERVER_MISCONFIGURATION',
+        },
+        { status: 500, headers: corsHeaders }
+      )
+    }
+
     if (errorMessage.includes("Can't reach database server") || errorMessage.includes('P1001')) {
       return NextResponse.json(
         { error: 'Base de dados indisponivel. Inicie o PostgreSQL e tente novamente.' },
