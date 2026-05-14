@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@wearcheck/database'
 import { getAuthTokenPayload, isAdminRole } from '../../../../lib/auth'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: Request) {
   try {
     const decoded = getAuthTokenPayload()

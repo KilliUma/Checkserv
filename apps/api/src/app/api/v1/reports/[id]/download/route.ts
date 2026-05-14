@@ -3,6 +3,8 @@ import { prisma } from '@wearcheck/database'
 import { getAuthTokenPayload } from '../../../../../../lib/auth'
 // import { generatePdfReport, type ReportData } from '@wearcheck/pdf'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(
   request: Request,
   { params }: { params: { id: string } }

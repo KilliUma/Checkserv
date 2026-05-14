@@ -5,6 +5,8 @@ import { sign } from 'jsonwebtoken'
 import { cookies } from 'next/headers'
 import { getCorsHeaders } from '@/lib/cors'
 
+export const dynamic = 'force-dynamic'
+
 function hasSupportedBcryptHash(passwordHash: string): boolean {
   return /^\$2[aby]\$\d{2}\$/.test(passwordHash)
 }
