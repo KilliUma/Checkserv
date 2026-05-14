@@ -101,6 +101,7 @@ export async function POST(request: Request) {
         email: user.email,
         role: user.role,
         customerId: user.customerId,
+        status: user.status,
       },
       process.env.NEXTAUTH_SECRET || 'secret',
       { expiresIn: '7d' }
