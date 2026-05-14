@@ -45,8 +45,8 @@ pnpm dev
 
 ### 4. Acessar
 
-- **Client Portal**: http://localhost:3001
-- **API**: http://localhost:3003
+- **Client Portal** (e `/admin`): http://localhost:3101
+- **API**: http://localhost:3103
 - **Prisma Studio**: http://localhost:5555 (executar: `pnpm db:studio`)
 
 ### 5. Login (após seed)
@@ -60,8 +60,8 @@ pnpm dev
 ## 📋 Comandos Essenciais
 
 ```bash
-# Desenvolvimento
-pnpm dev                          # Iniciar todos os apps
+# Desenvolvimento (sem o app legado backoffice)
+pnpm dev                          # Iniciar apps ativos
 pnpm --filter @wearcheck/api dev  # Apenas API
 
 # Database
@@ -69,8 +69,9 @@ pnpm db:generate                  # Gerar Prisma Client
 pnpm db:studio                    # Abrir Prisma Studio
 pnpm db:migrate                   # Executar migrations
 
-# Build
-pnpm build                        # Build de produção
+# Build (sem backoffice)
+pnpm build                        # Build de produção dos apps ativos
+pnpm build:backoffice-legacy      # Só se precisar do pacote legado
 
 # Limpeza
 pnpm clean                        # Limpar tudo

@@ -11,7 +11,7 @@ import {
   Calendar,
   Plus
 } from 'lucide-react'
-import axios from 'axios'
+import { portalApi } from '../lib/apiClient'
 import { useAuthStore } from '../stores/authStore'
 import { Button } from '@wearcheck/ui'
 import { useNavigate } from '@tanstack/react-router'
@@ -48,7 +48,7 @@ export function Dashboard() {
   const { data: samples, isLoading: loadingSamples } = useQuery<{ data: Sample[] }>({
     queryKey: ['samples'],
     queryFn: async () => {
-      const response = await axios.get('/api/v1/samples')
+      const response = await portalApi.get('/v1/samples')
       return response.data
     },
   })
@@ -56,7 +56,7 @@ export function Dashboard() {
   const { data: reports, isLoading: loadingReports } = useQuery<{ data: Report[] }>({
     queryKey: ['reports'],
     queryFn: async () => {
-      const response = await axios.get('/api/v1/reports')
+      const response = await portalApi.get('/v1/reports')
       return response.data
     },
   })
@@ -64,7 +64,7 @@ export function Dashboard() {
   const { data: equipment } = useQuery({
     queryKey: ['equipment'],
     queryFn: async () => {
-      const response = await axios.get('/api/v1/equipment')
+      const response = await portalApi.get('/v1/equipment')
       return response.data
     },
   })

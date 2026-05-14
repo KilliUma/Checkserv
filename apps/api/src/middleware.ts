@@ -16,12 +16,6 @@ function base64UrlToBytes(value: string): Uint8Array {
   return Uint8Array.from(binary, (char) => char.charCodeAt(0))
 }
 
-function bytesToArrayBuffer(bytes: Uint8Array): ArrayBuffer {
-  const copy = new Uint8Array(bytes.length)
-  copy.set(bytes)
-  return copy.buffer
-}
-
 function base64UrlToJson<T>(value: string): T | null {
   try {
     const bytes = base64UrlToBytes(value)
@@ -56,8 +50,8 @@ async function verifyAuthToken(token: string): Promise<AuthTokenPayload | null> 
   const isValid = await crypto.subtle.verify(
     'HMAC',
     key,
-    bytesToArrayBuffer(base64UrlToBytes(encodedSignature)),
-    bytesToArrayBuffer(new TextEncoder().encode(`${encodedHeader}.${encodedPayload}`))
+    base64UrlToBytes(encodedSignature) as unknown as BufferSource,
+    new TextEncoder().encode(`${encodedHeader}.${encodedPayload}`) as unknown as BufferSource
   )
 
   if (!isValid) {

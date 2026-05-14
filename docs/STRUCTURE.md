@@ -2,18 +2,19 @@
 
 ## 📦 Aplicações
 
-### 1. **apps/api** (porta 3003)
+### 1. **apps/api** (porta 3103)
 Backend Next.js 14 (API-only)
 - Autenticação NextAuth.js
 - Endpoints REST
 - Integração com Prisma
 
-### 2. **apps/client-portal** (porta 3001)
-Portal do Cliente - React + Vite
+### 2. **apps/client-portal** (porta 3101)
+Portal do Cliente e administração interna — React + Vite
 - Login autenticado
 - Submissão de amostras
 - Visualização de relatórios
 - Dashboard com métricas
+- Rotas **`/admin/*`** para staff (laboratório / admin da plataforma)
 
 ### 3. **apps/web** (porta 3000)
 Site Público - Next.js 14
@@ -22,13 +23,9 @@ Site Público - Next.js 14
 - Formulário de contacto
 - SEO otimizado
 
-### 4. **apps/backoffice** (porta 3002)
-Painel Administrativo - React + Vite
-- Gestão de usuários
-- Gestão de clientes
-- Processamento de amostras
-- Geração de relatórios
-- Configurações do sistema
+### 4. **apps/backoffice** (legado, porta 3102 com `pnpm dev:legacy`)
+Antigo painel administrativo em app separada — **descontinuado** para deploy; funcionalidade migrada para `client-portal` em `/admin`.
+- Mantido só para referência; não faz parte do `pnpm dev` na raiz
 
 ## 📚 Packages
 

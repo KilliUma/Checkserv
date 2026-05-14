@@ -21,8 +21,8 @@ O WearCheck é um sistema completo que permite:
 wearcheck-platform/
 ├── apps/
 │   ├── web/                 # Frontend público (React + Vite)
-│   ├── client-portal/       # Portal do cliente (React + Vite)
-│   ├── backoffice/          # Admin dashboard (React + Vite)
+│   ├── client-portal/       # Portal do cliente + área /admin (React + Vite)
+│   ├── backoffice/          # [Legado] antigo painel admin — não entra em `pnpm dev`; usar `pnpm dev:legacy` nesta pasta
 │   └── api/                 # Backend API (Next.js 14+)
 │
 ├── packages/
@@ -84,16 +84,18 @@ pnpm db:migrate
 # 5. (Opcional) Seed
 pnpm --filter @wearcheck/database db:seed
 
-# 6. Iniciar desenvolvimento
+# 6. Iniciar desenvolvimento (web, client-portal, api; **sem** o app legado `backoffice`)
 pnpm dev
 ```
+
+Para o antigo painel `apps/backoffice` apenas: `pnpm --filter @wearcheck/backoffice dev:legacy` (porta 3102).
 
 ### URLs de Desenvolvimento
 
 | Aplicação | URL | Porta |
 |-----------|-----|-------|
-| Portal do Cliente | http://localhost:3001 | 3001 |
-| API Backend | http://localhost:3003 | 3003 |
+| Portal do Cliente (e `/admin`) | http://localhost:3101 | 3101 |
+| API Backend | http://localhost:3103 | 3103 |
 | Prisma Studio | http://localhost:5555 | 5555 |
 | Adminer (DB) | http://localhost:8080 | 8080 |
 | WordPress (CMS) | http://localhost:8000 | 8000 |
@@ -118,20 +120,19 @@ pnpm dev
 - Blog (integrado com WordPress)
 - Formulários de contacto
 
-#### `client-portal` - Portal do Cliente
+#### `client-portal` - Portal do Cliente e Administração
 - Dashboard com métricas
 - Submissão de amostras
 - Visualização de relatórios (PDF)
 - Gestão de equipamentos
 - Análises técnicas (trends, pivot tables)
 - Gestão de ativos
+- **Área interna `/admin`** — aprovação de contas, utilizadores, clientes, amostras e relatórios (substitui o deploy separado do backoffice)
 
-#### `backoffice` - Admin Dashboard
-- Gestão de clientes
-- Processamento de amostras
-- Gestão de laboratórios
-- Relatórios administrativos
-- Sistema de permissões
+#### `backoffice` - [Legado]
+- Mantido no monorepo apenas para referência ou migração pontual
+- **Não** é iniciado por `pnpm dev` no root; para arrancar localmente: `pnpm --filter @wearcheck/backoffice dev:legacy`
+- Novo desenvolvimento administrativo deve usar **client-portal → `/admin`**
 
 #### `api` - Backend API
 - API REST completa
@@ -177,13 +178,19 @@ O schema cobre:
 ## 🔧 Scripts Disponíveis
 
 ```bash
-# Desenvolvimento
+# Desenvolvimento (exclui o app legado @wearcheck/backoffice)
 pnpm dev              # Iniciar todos os apps em modo dev
 pnpm dev --filter=api # Iniciar apenas a API
 
-# Build
-pnpm build            # Build de produção de todos os apps
+# Build (exclui @wearcheck/backoffice)
+pnpm build            # Build de produção dos apps ativos
 pnpm build --filter=web # Build apenas do web
+
+# App backoffice legado (se precisar)
+pnpm build:backoffice-legacy
+pnpm lint:backoffice-legacy
+pnpm type-check:backoffice-legacy
+pnpm --filter @wearcheck/backoffice dev:legacy
 
 # Database
 pnpm db:generate      # Gerar Prisma Client
@@ -191,8 +198,8 @@ pnpm db:push          # Push schema para DB (dev)
 pnpm db:migrate       # Executar migrations
 pnpm db:studio        # Abrir Prisma Studio
 
-# Qualidade de Código
-pnpm lint             # Lint de todos os packages
+# Qualidade de Código (exclui @wearcheck/backoffice)
+pnpm lint             # Lint dos packages ativos
 pnpm format           # Format código com Prettier
 pnpm type-check       # Verificar tipos TypeScript
 

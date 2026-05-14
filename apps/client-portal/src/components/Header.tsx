@@ -4,6 +4,8 @@ import { useLanguage } from '../contexts/LanguageContext'
 import { useAuthStore } from '../stores/authStore'
 import { useNavigate } from '@tanstack/react-router'
 import { withBasePath } from '../utils/basePath'
+import { isStaffRole } from '../utils/roles'
+import { NotificationsMenu } from './NotificationsMenu'
 
 export function Header() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -170,14 +172,20 @@ export function Header() {
                   }`}></span>
                 </a>
                 
-                <a href={withBasePath('/configuracoes')} className={`px-4 py-2 text-sm font-semibold transition relative group ${
-                  isScrolled ? 'text-gray-700 hover:text-red-600' : 'text-white hover:text-red-400'
-                }`}>
-                  Configurações
-                  <span className={`absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all ${
-                    isScrolled ? 'bg-red-600' : 'bg-white'
-                  }`}></span>
-                </a>
+                {isStaffRole(session?.user?.role) && (
+                  <a href={withBasePath('/admin/dashboard')} className={`px-4 py-2 text-sm font-semibold transition relative group ${
+                    isScrolled ? 'text-gray-700 hover:text-red-600' : 'text-white hover:text-red-400'
+                  }`}>
+                    Administração
+                    <span className={`absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all ${
+                      isScrolled ? 'bg-red-600' : 'bg-white'
+                    }`}></span>
+                  </a>
+                )}
+
+                <div className="ml-2">
+                  <NotificationsMenu />
+                </div>
 
                 {/* User Menu */}
                 <div className="relative ml-4"

@@ -1,9 +1,8 @@
+/** Origens por defeito. Administração: client-portal em `/admin`. Origens extra (ex. backoffice legado em :3102) via `CORS_ALLOWED_ORIGINS`. */
 const DEFAULT_ALLOWED_ORIGINS = [
   'http://localhost:3100',
   'http://localhost:3101',
-  'http://localhost:3102',
   'https://checkserv-client-portal.vercel.app',
-  'https://checkserv-backoffice.vercel.app',
   'https://checkserv-web.vercel.app',
   'https://checkserv-api.vercel.app',
 ]

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Input, Select, Button } from '@wearcheck/ui'
-import axios from 'axios'
+import { portalApi } from '../lib/apiClient'
 import { X } from 'lucide-react'
 
 interface Equipment {
@@ -39,7 +39,7 @@ export function SampleForm({ onClose, onSuccess }: SampleFormProps) {
   const { data: equipmentData } = useQuery<{ data: Equipment[] }>({
     queryKey: ['equipment'],
     queryFn: async () => {
-      const response = await axios.get('/api/v1/equipment')
+      const response = await portalApi.get('/v1/equipment')
       return response.data
     },
   })
@@ -50,7 +50,7 @@ export function SampleForm({ onClose, onSuccess }: SampleFormProps) {
   // Mutation para criar amostra
   const createSample = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const response = await axios.post('/api/v1/samples', data)
+      const response = await portalApi.post('/v1/samples', data)
       return response.data
     },
     onSuccess: () => {

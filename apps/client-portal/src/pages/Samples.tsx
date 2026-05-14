@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { Button } from '@wearcheck/ui'
 import { SampleForm } from '../components/SampleForm'
 import { FlaskConical, Search, Filter, Download, Plus, Clock, CheckCircle } from 'lucide-react'
-import axios from 'axios'
+import { portalApi } from '../lib/apiClient'
+import { sampleStatusBadgeClass, sampleStatusLabel } from '../utils/sampleStatus'
 import { useAuthStore } from '../stores/authStore'
 
 interface Sample {
@@ -25,23 +26,17 @@ export function Samples() {
   const { data: samples, isLoading } = useQuery<{ data: Sample[] }>({
     queryKey: ['samples'],
     queryFn: async () => {
-      const response = await axios.get('/api/v1/samples')
+      const response = await portalApi.get('/v1/samples')
       return response.data
     },
   })
 
   const getStatusBadge = (status: string) => {
-    const badges: Record<string, { bg: string; text: string; label: string }> = {
-      REGISTERED: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Registada' },
-      IN_TRANSIT: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Em Trânsito' },
-      RECEIVED: { bg: 'bg-purple-100', text: 'text-purple-700', label: 'Recebida' },
-      TESTING: { bg: 'bg-orange-100', text: 'text-orange-700', label: 'Em Análise' },
-      COMPLETED: { bg: 'bg-green-100', text: 'text-green-700', label: 'Completa' },
-    }
-    const badge = badges[status] || { bg: 'bg-gray-100', text: 'text-gray-700', label: status }
+    const { bg, text } = sampleStatusBadgeClass(status)
+    const label = sampleStatusLabel(status)
     return (
-      <span className={`px-3 py-1 rounded-full text-xs font-medium ${badge.bg} ${badge.text}`}>
-        {badge.label}
+      <span className={`px-3 py-1 rounded-full text-xs font-medium ${bg} ${text}`}>
+        {label}
       </span>
     )
   }

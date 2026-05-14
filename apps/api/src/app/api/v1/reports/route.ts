@@ -57,6 +57,12 @@ export async function GET(request: Request) {
         take: limit,
         orderBy: { reportDate: 'desc' },
         include: {
+          customer: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
           sample: {
             include: {
               equipment: {

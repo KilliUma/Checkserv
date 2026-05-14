@@ -28,7 +28,8 @@ mkdir -p cpanel-deploy
 echo "📋 Copiando arquivos..."
 cp -r apps/api/.next cpanel-deploy/api-next
 cp -r apps/client-portal/dist cpanel-deploy/client-portal
-cp -r apps/backoffice/dist cpanel-deploy/backoffice
+# Opcional — legado; administração em client-portal /admin
+# cp -r apps/backoffice/dist cpanel-deploy/backoffice
 cp package.json cpanel-deploy/
 cp pnpm-lock.yaml cpanel-deploy/
 

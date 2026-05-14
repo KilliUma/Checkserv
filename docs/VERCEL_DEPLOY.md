@@ -1,12 +1,11 @@
 # Deploy na Vercel (Site + Sistema)
 
 Este guia deixa o monorepo pronto para publicar:
-- Site institucional: apps/web
-- Sistema administrativo: apps/backoffice
-- API: apps/api
+- Site institucional: `apps/web`
+- **Portal do cliente e administração interna** (`/admin`): `apps/client-portal`
+- API: `apps/api`
 
-Opcional:
-- Portal do cliente: apps/client-portal
+**Legado (opcional):** `apps/backoffice` — não é o destino recomendado; a administração vive no `client-portal`.
 
 ## 1) Pré-requisitos
 
@@ -19,89 +18,89 @@ Opcional:
 Crie projetos separados, todos apontando para o mesmo repositório:
 
 1. Projeto API
-- Root Directory: apps/api
+- Root Directory: `apps/api`
 - Framework Preset: Next.js
 
 2. Projeto Site
-- Root Directory: apps/web
+- Root Directory: `apps/web`
 - Framework Preset: Next.js
 
-3. Projeto Sistema (Backoffice)
-- Root Directory: apps/backoffice
+3. Projeto **Portal do cliente** (inclui `/admin` para staff)
+- Root Directory: `apps/client-portal`
 - Framework Preset: Vite
 
-4. Opcional: Portal do cliente
-- Root Directory: apps/client-portal
+4. _(Opcional / legado)_ Antigo backoffice em app separada
+- Root Directory: `apps/backoffice`
 - Framework Preset: Vite
+- Só se ainda precisar de um URL dedicado durante transição; caso contrário pode omitir o projeto.
 
 ## 3) Variáveis de ambiente
 
-### API (apps/api)
+### API (`apps/api`)
 
 Obrigatórias:
-- DATABASE_URL
-- DIRECT_URL
-- NEXTAUTH_SECRET
-- NEXTAUTH_URL
+- `DATABASE_URL`
+- `DIRECT_URL`
+- `NEXTAUTH_SECRET`
+- `NEXTAUTH_URL`
 
 Recomendadas:
-- SMTP_HOST
-- SMTP_PORT
-- SMTP_USER
-- SMTP_PASSWORD
-- EMAIL_FROM
+- `SMTP_HOST`
+- `SMTP_PORT`
+- `SMTP_USER`
+- `SMTP_PASSWORD`
+- `EMAIL_FROM`
 
-NEXTAUTH_URL deve ser a URL final da API na Vercel.
+`CORS_ALLOWED_ORIGINS`: lista separada por vírgulas com origens extra (ex.: URL legada do backoffice ou preview Vercel) se não forem cobertas pelos defaults em `apps/api/src/lib/cors.ts`.
+
+`NEXTAUTH_URL` deve ser a URL final da API na Vercel.
 
 Se estiver a usar Neon:
-- DATABASE_URL deve apontar para a connection string pooled, normalmente com `-pooler` ou a URL indicada para aplicações serverless
-- DIRECT_URL deve apontar para a connection string direta do banco, usada pelo Prisma em migrações e tarefas administrativas
+- `DATABASE_URL` deve apontar para a connection string pooled, normalmente com `-pooler` ou a URL indicada para aplicações serverless
+- `DIRECT_URL` deve apontar para a connection string direta do banco, usada pelo Prisma em migrações e tarefas administrativas
 - Se o Neon exigir SSL explícito, mantenha `?sslmode=require` na URL fornecida pela plataforma
 
 Exemplo:
-- DATABASE_URL=postgresql://user:pass@ep-xxx-pooler.us-east-1.aws.neon.tech/wearcheck?sslmode=require
-- DIRECT_URL=postgresql://user:pass@ep-xxx.us-east-1.aws.neon.tech/wearcheck?sslmode=require
+- `DATABASE_URL=postgresql://user:pass@ep-xxx-pooler.us-east-1.aws.neon.tech/wearcheck?sslmode=require`
+- `DIRECT_URL=postgresql://user:pass@ep-xxx.us-east-1.aws.neon.tech/wearcheck?sslmode=require`
 
-### Site (apps/web)
+### Site (`apps/web`)
 
-- NEXT_PUBLIC_CLIENT_PORTAL_URL
+- `NEXT_PUBLIC_CLIENT_PORTAL_URL`
 
-Use a URL pública do sistema/portal que vai receber login do cliente.
+Use a URL pública do **client-portal** (login do cliente e área `/admin` para staff).
 
-### Sistema Backoffice (apps/backoffice)
+### Portal do cliente (`apps/client-portal`)
 
-- VITE_API_URL
+- `VITE_API_URL`
+- `VITE_BASE_PATH` (opcional)
 
-Use a URL pública da API (sem barra no final).
-Exemplo: https://checkserv-api.vercel.app
+Para Vercel use `VITE_BASE_PATH=/`
+Para cPanel em subpasta use `VITE_BASE_PATH=/checkserv/`
 
-### Portal do cliente (apps/client-portal)
+### Backoffice legado (`apps/backoffice`)
 
-- VITE_API_URL
-- VITE_BASE_PATH (opcional)
-
-Para Vercel use VITE_BASE_PATH=/
-Para cPanel em subpasta use VITE_BASE_PATH=/checkserv/
+- `VITE_API_URL` — só se mantiver deploy deste app
 
 ## 4) Ordem recomendada de deploy
 
 1. Deploy da API
-2. Configurar URL da API nos projetos Vite (VITE_API_URL)
+2. Configurar URL da API nos projetos Vite (`VITE_API_URL`)
 3. Deploy do Site
-4. Deploy do Sistema (Backoffice)
-5. Deploy opcional do Portal do cliente
+4. Deploy do **client-portal** (portal + `/admin`)
+5. _(Opcional)_ Deploy do backoffice legado
 
 ## 5) Checklist pós-deploy
 
-- API responde em /api/auth/session
-- Login do sistema funciona
-- Site redireciona corretamente para o portal/sistema
+- API responde em `/api/auth/session`
+- Login no client-portal funciona; staff acede a `/admin`
+- Site redireciona corretamente para o portal
 - Cookies de sessão funcionando em produção
 
 ## 6) Observações importantes
 
-- O app apps/api já está configurado para transpilar pacotes do monorepo na build.
-- Os apps Vite já usam VITE_API_URL para comunicação com a API.
+- O app `apps/api` já está configurado para transpilar pacotes do monorepo na build.
+- Os apps Vite já usam `VITE_API_URL` para comunicação com a API.
 - Se houver bloqueio de autenticação por cookies entre domínios, valide CORS e política de cookies no backend.
 - **Canvas e gráficos**: O pacote `canvas` é opcional na Vercel. Se a geração de gráficos em PDFs falhar, é porque a compilação nativa não conseguiu em ambiente Linux. Isso não afeta o funcionamento da API, apenas a renderização de gráficos complexos em relatórios. A API continua a funcionar normalmente.
 
@@ -120,7 +119,7 @@ Se alguma estiver ausente, o build falha com mensagem clara para evitar deploy b
 
 Para reduzir tempo de build e evitar builds desnecessários, configure cada projeto separadamente na Vercel.
 
-### API (apps/api)
+### API (`apps/api`)
 
 - Root Directory: `apps/api`
 - Install Command: `pnpm install --frozen-lockfile`
@@ -129,14 +128,21 @@ Para reduzir tempo de build e evitar builds desnecessários, configure cada proj
 
 Se o log mostrar `turbo run build` para o projeto da API, o Build Command está herdando do root do monorepo e ficará mais lento.
 
-### Site (apps/web)
+### Site (`apps/web`)
 
 - Root Directory: `apps/web`
 - Install Command: `pnpm install --frozen-lockfile`
 - Build Command: `pnpm run build`
 - Node.js Version: `20.x`
 
-### Sistema (apps/backoffice)
+### Client-portal (`apps/client-portal`)
+
+- Root Directory: `apps/client-portal`
+- Install Command: `pnpm install --frozen-lockfile`
+- Build Command: `pnpm run build`
+- Node.js Version: `20.x`
+
+### Backoffice legado (`apps/backoffice`)
 
 - Root Directory: `apps/backoffice`
 - Install Command: `pnpm install --frozen-lockfile`
@@ -159,7 +165,13 @@ Site:
 git diff --quiet HEAD^ HEAD -- apps/web packages/ui packages/types && exit 0 || exit 1
 ```
 
-Backoffice:
+Client-portal:
+
+```bash
+git diff --quiet HEAD^ HEAD -- apps/client-portal packages/ui packages/types && exit 0 || exit 1
+```
+
+Backoffice (se o projeto Vercel ainda existir):
 
 ```bash
 git diff --quiet HEAD^ HEAD -- apps/backoffice packages/ui packages/types && exit 0 || exit 1

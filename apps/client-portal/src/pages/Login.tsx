@@ -4,6 +4,7 @@ import { Lock, Mail, ArrowRight, Shield, Zap, BarChart3, Eye, EyeOff } from 'luc
 import { useAuthStore } from '../stores/authStore'
 import toast from 'react-hot-toast'
 import { withBasePath } from '../utils/basePath'
+import { getDefaultRouteForRole } from '../utils/roles'
 
 export function Login() {
   const [email, setEmail] = useState('')
@@ -19,8 +20,9 @@ export function Login() {
 
     try {
       await login(email, password)
+      const session = useAuthStore.getState().session
       toast.success('Login realizado com sucesso!')
-      navigate({ to: '/dashboard' })
+      navigate({ to: getDefaultRouteForRole(session?.user.role) })
     } catch (err: any) {
       toast.error(err.message || 'Não foi possível iniciar sessão')
     } finally {

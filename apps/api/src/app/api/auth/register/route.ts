@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { hash } from 'bcryptjs'
 import { prisma } from '@wearcheck/database'
+import { notifyAdmins } from '../../../../lib/notifications'
 
 export async function POST(request: Request) {
   try {
@@ -93,6 +94,18 @@ export async function POST(request: Request) {
 
     const user = await prisma.user.create({
       data: userData,
+    })
+
+    await notifyAdmins({
+      title: 'Novo usuário aguardando aprovação',
+      message: `${user.name} registou-se pela empresa ${customer.name}.`,
+      actionUrl: '/admin/aprovacao',
+      data: {
+        userId: user.id,
+        customerId: customer.id,
+        email: user.email,
+      },
+      type: 'SYSTEM_ALERT',
     })
 
     return NextResponse.json(

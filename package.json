@@ -4,9 +4,9 @@
   "private": true,
   "description": "WearCheck Online System - Plataforma Modular de Análise de Fluidos e Monitoramento",
   "scripts": {
-    "dev": "turbo run dev",
-    "build": "turbo run build",
-    "lint": "turbo run lint",
+    "dev": "turbo run dev --filter='!@wearcheck/backoffice'",
+    "build": "turbo run build --filter='!@wearcheck/backoffice'",
+    "lint": "turbo run lint --filter='!@wearcheck/backoffice'",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
     "git:auto": "sh ./scripts/git-auto.sh",
     "clean": "turbo run clean && rm -rf node_modules",
@@ -14,7 +14,10 @@
     "db:push": "turbo run db:push",
     "db:migrate": "turbo run db:migrate",
     "db:studio": "turbo run db:studio",
-    "type-check": "turbo run type-check"
+    "type-check": "turbo run type-check --filter='!@wearcheck/backoffice'",
+    "build:backoffice-legacy": "pnpm --filter @wearcheck/backoffice build",
+    "lint:backoffice-legacy": "pnpm --filter @wearcheck/backoffice lint",
+    "type-check:backoffice-legacy": "pnpm --filter @wearcheck/backoffice type-check"
   },
   "devDependencies": {
     "@turbo/gen": "^2.0.0",

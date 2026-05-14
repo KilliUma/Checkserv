@@ -58,6 +58,9 @@ pnpm dev
 # Ou iniciar apps individuais
 pnpm --filter @wearcheck/api dev
 pnpm --filter @wearcheck/client-portal dev
+
+# Backoffice legado (app separada; administração preferível em client-portal /admin)
+# pnpm --filter @wearcheck/backoffice dev:legacy
 ```
 
 ## 📁 Estrutura do Projeto
@@ -66,8 +69,8 @@ pnpm --filter @wearcheck/client-portal dev
 wearcheck-platform/
 ├── apps/
 │   ├── web/              # Frontend público
-│   ├── client-portal/    # Portal do cliente
-│   ├── backoffice/       # Admin dashboard
+│   ├── client-portal/    # Portal do cliente + /admin (staff)
+│   ├── backoffice/       # [Legado] painel admin antigo — `pnpm dev:legacy` neste package
 │   └── api/              # Backend API (Next.js)
 │
 ├── packages/
@@ -163,11 +166,14 @@ pnpm test:coverage
 ## 🔨 Build
 
 ```bash
-# Build todos os apps
+# Build dos apps ativos (exclui @wearcheck/backoffice legado)
 pnpm build
 
 # Build app específico
 pnpm --filter @wearcheck/api build
+
+# Pacote legado backoffice, se necessário
+pnpm build:backoffice-legacy
 ```
 
 ## 🐛 Debugging

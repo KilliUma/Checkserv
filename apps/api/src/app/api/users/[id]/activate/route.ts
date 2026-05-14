@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@wearcheck/database'
 import { getAuthTokenPayload, isAdminRole } from '../../../../../lib/auth'
+import { createInAppNotification } from '../../../../../lib/notifications'
 
 export const dynamic = 'force-dynamic'
 
@@ -49,6 +50,17 @@ export async function POST(
         data: { status: 'ACTIVE' },
       })
     }
+
+    await createInAppNotification({
+      userId: user.id,
+      title: 'Conta aprovada',
+      message: 'A sua conta CheckServ foi aprovada. Já pode aceder ao sistema.',
+      actionUrl: '/dashboard',
+      data: {
+        approvedBy: decoded.id,
+      },
+      type: 'SYSTEM_ALERT',
+    })
 
     return NextResponse.json({
       message: 'Usuário ativado com sucesso',

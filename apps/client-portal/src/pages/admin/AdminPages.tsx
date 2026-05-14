@@ -1,0 +1,7 @@
+export { AdminApprovals } from './AdminApprovalsPage'
+export { AdminCustomers } from './AdminCustomersPage'
+export { AdminDashboard } from './AdminDashboardPage'
+export { AdminReports } from './AdminReportsPage'
+export { AdminSamples } from './AdminSamplesPage'
+export { AdminSettings } from './AdminSettingsPage'
+export { AdminUsers } from './AdminUsersPage'

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Button, Input, Select, Card, Badge, Spinner } from '@wearcheck/ui'
 import { Download, Eye, FileText, Filter } from 'lucide-react'
-import axios from 'axios'
+import { portalApi, reportDownloadAbsoluteUrl } from '../lib/apiClient'
 import { format } from 'date-fns'
 import { pt } from 'date-fns/locale'
 
@@ -44,14 +44,14 @@ export function Reports() {
           Object.entries(filters).filter(([_, value]) => value !== '')
         ),
       })
-      const response = await axios.get(`/api/v1/reports?${params}`)
+      const response = await portalApi.get(`/v1/reports?${params}`)
       return response.data
     },
   })
 
   const handleDownload = async (reportId: string, reportNumber: string) => {
     try {
-      const response = await axios.get(`/api/v1/reports/${reportId}/download`, {
+      const response = await portalApi.get(`/v1/reports/${reportId}/download`, {
         responseType: 'blob',
       })
       
@@ -212,7 +212,7 @@ export function Reports() {
                             variant="ghost"
                             onClick={() =>
                               window.open(
-                                `/api/v1/reports/${report.id}/download`,
+                                reportDownloadAbsoluteUrl(report.id),
                                 '_blank'
                               )
                             }

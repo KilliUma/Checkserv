@@ -1,12 +1,4 @@
-import axios from 'axios'
-import { getApiBaseUrl } from '../utils/apiBaseUrl'
-
-const apiBaseUrl = getApiBaseUrl()
-
-const api = axios.create({
-  baseURL: `${apiBaseUrl}/api`,
-  withCredentials: true,
-})
+import { portalApi as api } from '../lib/apiClient'
 
 export interface AuthSession {
   user: {

@@ -1,8 +1,16 @@
 import { prisma } from '@wearcheck/database'
 import { NextRequest, NextResponse } from 'next/server'
+import { getAuthTokenPayload } from '../../../../lib/auth'
+
+export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
   try {
+    const decoded = getAuthTokenPayload()
+    if (!decoded) {
+      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
+    }
+
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status')
     const customerId = searchParams.get('customerId')
@@ -13,7 +21,9 @@ export async function GET(request: NextRequest) {
       where.status = status
     }
     
-    if (customerId) {
+    if (decoded.customerId) {
+      where.customerId = decoded.customerId
+    } else if (customerId) {
       where.customerId = customerId
     }
 
@@ -51,10 +61,17 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const decoded = getAuthTokenPayload()
+    if (!decoded) {
+      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
+    }
+
     const body = await request.json()
+    const customerId = decoded.customerId || body.customerId
+    const submittedBy = decoded.id || body.submittedBy
     
     // Validação básica
-    if (!body.equipmentId || !body.customerId) {
+    if (!body.equipmentId || !customerId || !submittedBy) {
       return NextResponse.json(
         { success: false, error: 'Missing required fields' },
         { status: 400 }
@@ -76,7 +93,7 @@ export async function POST(request: NextRequest) {
     const sample = await prisma.sample.create({
       data: {
         sampleNumber,
-        customerId: body.customerId,
+        customerId,
         equipmentId: body.equipmentId,
         componentId: body.componentId,
         siteId: body.siteId,
@@ -87,7 +104,7 @@ export async function POST(request: NextRequest) {
         fluidGrade: body.fluidGrade,
         hoursSinceChange: body.hoursSinceChange,
         customerComment: body.customerComment,
-        submittedBy: body.submittedBy,
+        submittedBy,
       },
       include: {
         equipment: true,

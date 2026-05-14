@@ -1,14 +1,24 @@
 import { prisma } from '@wearcheck/database'
 import { NextRequest, NextResponse } from 'next/server'
+import { getAuthTokenPayload } from '../../../../lib/auth'
+
+export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
   try {
+    const decoded = getAuthTokenPayload()
+    if (!decoded) {
+      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
+    }
+
     const { searchParams } = new URL(request.url)
     const customerId = searchParams.get('customerId')
 
     const where: any = {}
     
-    if (customerId) {
+    if (decoded.customerId) {
+      where.customerId = decoded.customerId
+    } else if (customerId) {
       where.customerId = customerId
     }
 
@@ -50,7 +60,13 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const decoded = getAuthTokenPayload()
+    if (!decoded) {
+      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
+    }
+
     const body = await request.json()
+    const customerId = decoded.customerId || body.customerId
     
     const equipment = await prisma.equipment.create({
       data: {
@@ -60,7 +76,7 @@ export async function POST(request: NextRequest) {
         model: body.model,
         year: body.year,
         serialNumber: body.serialNumber,
-        customerId: body.customerId,
+        customerId,
         siteId: body.siteId,
         currentReading: body.currentReading,
         readingUnit: body.readingUnit,
