@@ -12,6 +12,7 @@ import {
 import { useAuthStore } from '../stores/authStore'
 import { isAdminRole } from '../utils/roles'
 import { withBasePath } from '../utils/basePath'
+import { NotificationsMenu } from './NotificationsMenu'
 
 const staffItems = [
   { path: '/admin/dashboard', label: 'Dashboard', icon: BarChart3 },
@@ -77,6 +78,7 @@ export function AdminLayout() {
             <div className="font-semibold text-gray-900">{session?.user.name}</div>
           </div>
           <div className="flex items-center gap-4">
+            <NotificationsMenu compact />
             <a
               href={withBasePath('/dashboard')}
               className="text-sm font-medium text-gray-600 hover:text-wearcheck-orange"
