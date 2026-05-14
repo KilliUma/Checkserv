@@ -70,10 +70,10 @@ pnpm dev
 
 **Cliente:**
 - Email: user@demomining.co.za
-- Senha: Demo@123
+- Senha: Admin@123
 
 **Admin:**
-- Email: admin@wearcheck.co.za
+- Email: admin@checkserv.co.ao
 - Senha: Admin@123
 
 ## 📊 Banco de Dados

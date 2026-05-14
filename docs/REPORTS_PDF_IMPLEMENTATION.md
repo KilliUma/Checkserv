@@ -115,7 +115,7 @@ http://localhost:3001/login
 
 **Credenciais de teste**:
 - Email: `user@demomining.co.za`
-- Senha: `Demo@123`
+- Senha: `Admin@123`
 
 ### 3. Navegar para Relatórios
 - Click em "Relatórios" no menu lateral

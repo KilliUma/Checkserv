@@ -127,12 +127,12 @@ pnpm --filter @wearcheck/database db:seed
 Após executar o seed:
 
 **Super Admin:**
-- Email: admin@wearcheck.co.za
-- Password: Demo@123
+- Email: admin@checkserv.co.ao
+- Password: Admin@123
 
 **Cliente Demo:**
 - Email: user@demomining.co.za
-- Password: Demo@123
+- Password: Admin@123
 
 ## 📦 Adicionar Dependência
 

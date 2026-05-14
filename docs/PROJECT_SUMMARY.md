@@ -247,7 +247,7 @@ pnpm dev
 ### 5. Login (Demo)
 
 - Email: `user@demomining.co.za`
-- Password: `Demo@123`
+- Password: `Admin@123`
 
 ---
 
