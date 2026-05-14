@@ -1,4 +1,4 @@
-import { Search, Facebook, Youtube, Twitter, Linkedin, Menu, ChevronDown, Globe, User, LogOut } from 'lucide-react'
+import { Search, Facebook, Youtube, Twitter, Linkedin, Menu, ChevronDown, Globe, User, LogOut, Settings } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useLanguage } from '../contexts/LanguageContext'
 import { useAuthStore } from '../stores/authStore'
@@ -206,9 +206,13 @@ export function Header() {
                         <p className="text-xs text-gray-500">Logado como</p>
                         <p className="text-sm font-semibold text-gray-900 truncate">{session?.user?.email}</p>
                       </div>
-                      <a href={withBasePath('/')} className="flex items-center gap-2 px-5 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">
+                      <a href={withBasePath('/perfil')} className="flex items-center gap-2 px-5 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">
                         <User size={16} />
                         Meu Perfil
+                      </a>
+                      <a href={withBasePath('/configuracoes')} className="flex items-center gap-2 px-5 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition">
+                        <Settings size={16} />
+                        Configurações
                       </a>
                       <button 
                         onClick={handleLogout}

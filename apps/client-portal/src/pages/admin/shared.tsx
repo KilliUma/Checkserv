@@ -114,7 +114,7 @@ export function PageHeader({
   return (
     <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
       <div className="flex items-center gap-3">
-        <div className="flex h-11 w-11 items-center justify-center rounded-md bg-wearcheck-orange/15 text-wearcheck-orange">
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-red-100 text-red-600 shadow-sm">
           <Icon size={22} />
         </div>
         <div>
@@ -133,7 +133,7 @@ export function RefreshButton({ onClick, busy }: { onClick: () => void; busy?: b
       type="button"
       onClick={onClick}
       disabled={busy}
-      className="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+      className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
     >
       <RefreshCw size={16} className={busy ? 'animate-spin' : ''} />
       Atualizar
@@ -157,20 +157,20 @@ export function SearchBox({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-md border border-gray-300 bg-white py-2.5 pl-10 pr-3 text-sm focus:border-wearcheck-orange focus:outline-none focus:ring-2 focus:ring-orange-100"
+        className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-10 pr-3 text-sm shadow-sm focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-100"
       />
     </div>
   )
 }
 
 export function EmptyState({ label }: { label: string }) {
-  return <div className="rounded-md bg-white p-10 text-center text-sm text-gray-600 shadow-sm">{label}</div>
+  return <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center text-sm text-gray-600 shadow-sm">{label}</div>
 }
 
 export function LoadingState() {
   return (
-    <div className="rounded-md bg-white p-10 text-center text-sm text-gray-600 shadow-sm">
-      <RefreshCw className="mx-auto mb-3 animate-spin text-wearcheck-orange" size={24} />
+    <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center text-sm text-gray-600 shadow-sm">
+      <RefreshCw className="mx-auto mb-3 animate-spin text-red-600" size={24} />
       A carregar dados...
     </div>
   )

@@ -59,7 +59,7 @@ export class PDFGenerator {
         doc
           .fontSize(12)
           .fillColor('#000000')
-          .text(`Número da Amostra: ${data.sampleNumber}`, { bold: true })
+          .text(`Número da Amostra: ${data.sampleNumber}`)
           .text(`Data de Recebimento: ${data.sample.dateReceived.toLocaleDateString('pt-BR')}`)
           .text(`Data de Teste: ${data.sample.dateTested.toLocaleDateString('pt-BR')}`)
           .moveDown()

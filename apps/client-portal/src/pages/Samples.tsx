@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Button } from '@wearcheck/ui'
 import { SampleForm } from '../components/SampleForm'
-import { FlaskConical, Search, Filter, Download, Plus, Clock, CheckCircle } from 'lucide-react'
+import { FlaskConical, Search, Filter, Download, Plus, Clock, CheckCircle, X } from 'lucide-react'
 import { portalApi } from '../lib/apiClient'
 import { sampleStatusBadgeClass, sampleStatusLabel } from '../utils/sampleStatus'
 import { useAuthStore } from '../stores/authStore'
@@ -11,16 +11,29 @@ interface Sample {
   id: string
   sampleNumber: string
   status: string
+  type?: string
+  priority?: string
+  equipmentReading?: number
+  fluidType?: string
+  fluidGrade?: string
+  customerComment?: string
   equipment: {
     equipmentNo: string
     description: string
   }
+  component?: {
+    componentNo: string
+    type: string
+  } | null
   createdAt: string
 }
 
 export function Samples() {
   const [showForm, setShowForm] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
+  const [showFilters, setShowFilters] = useState(false)
+  const [selectedSample, setSelectedSample] = useState<Sample | null>(null)
   const { session } = useAuthStore()
 
   const { data: samples, isLoading } = useQuery<{ data: Sample[] }>({
@@ -47,36 +60,70 @@ export function Samples() {
     { icon: CheckCircle, label: 'Completas', value: samples?.data?.filter(s => s.status === 'COMPLETED').length || 0, color: 'bg-green-500' },
   ]
 
+  const filteredSamples = (samples?.data || []).filter((sample) => {
+    const haystack = `${sample.sampleNumber} ${sample.equipment?.equipmentNo || ''} ${sample.equipment?.description || ''} ${sample.status}`.toLowerCase()
+    const matchesSearch = haystack.includes(searchTerm.toLowerCase())
+    const matchesStatus = !statusFilter || sample.status === statusFilter
+    return matchesSearch && matchesStatus
+  })
+
+  const exportCsv = () => {
+    const rows = filteredSamples.map((sample) => ({
+      amostra: sample.sampleNumber,
+      equipamento: sample.equipment?.equipmentNo || '',
+      descricao: sample.equipment?.description || '',
+      estado: sampleStatusLabel(sample.status),
+      data: new Date(sample.createdAt).toLocaleDateString('pt-PT'),
+    }))
+    const header = ['Amostra', 'Equipamento', 'Descrição', 'Estado', 'Data']
+    const csv = [
+      header.join(','),
+      ...rows.map((row) =>
+        [row.amostra, row.equipamento, row.descricao, row.estado, row.data]
+          .map((value) => `"${String(value).replace(/"/g, '""')}"`)
+          .join(',')
+      ),
+    ].join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'amostras-checkserv.csv'
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    URL.revokeObjectURL(url)
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-red-600 to-red-700 text-white pt-32 pb-16">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-red-50">
+      <div className="border-b border-gray-200 bg-white">
         <div className="container mx-auto px-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between py-8">
             <div className="flex-1">
-              <h1 className="text-4xl font-bold mb-3">
+              <h1 className="mb-2 text-3xl font-bold text-gray-900">
                 Bem-vindo, {session?.user?.name?.split(' ')[0] || 'Usuário'}
               </h1>
-              <p className="text-red-100 text-lg mb-6">
+              <p className="mb-5 text-gray-600">
                 Gerencie suas amostras de óleo e acompanhe resultados de análises em tempo real
               </p>
               <Button 
                 variant="primary" 
                 onClick={() => setShowForm(true)}
-                className="bg-white text-red-600 hover:bg-red-50 shadow-lg"
+                className="!bg-red-600 !text-white hover:!bg-red-700 shadow-lg shadow-red-500/20"
               >
                 <Plus size={20} className="mr-2" />
                 Registrar Nova Amostra
               </Button>
             </div>
             <div className="hidden lg:block">
-              <FlaskConical size={120} className="text-red-300 opacity-50" />
+              <FlaskConical size={72} className="text-red-100" />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-6 -mt-8 pb-12">
+      <div className="container mx-auto px-6 py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {stats.map((stat, index) => (
@@ -96,7 +143,7 @@ export function Samples() {
 
         {/* Search and Filter Bar */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-          <div className="flex gap-4">
+          <div className="flex flex-col gap-4 lg:flex-row">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
               <input
@@ -107,15 +154,52 @@ export function Samples() {
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
               />
             </div>
-            <Button variant="secondary" className="border-red-600 text-red-600 hover:bg-red-50">
+            <Button
+              variant="secondary"
+              onClick={() => setShowFilters(!showFilters)}
+              className="border-red-600 text-red-600 hover:bg-red-50"
+            >
               <Filter size={18} className="mr-2" />
               Filtros
             </Button>
-            <Button variant="secondary" className="border-red-600 text-red-600 hover:bg-red-50">
+            <Button
+              variant="secondary"
+              onClick={exportCsv}
+              className="border-red-600 text-red-600 hover:bg-red-50"
+            >
               <Download size={18} className="mr-2" />
               Exportar
             </Button>
           </div>
+          {showFilters && (
+            <div className="mt-4 flex flex-col gap-3 border-t border-gray-100 pt-4 sm:flex-row sm:items-end">
+              <label className="block min-w-56">
+                <span className="mb-1 block text-sm font-semibold text-gray-700">Estado</span>
+                <select
+                  value={statusFilter}
+                  onChange={(event) => setStatusFilter(event.target.value)}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-100"
+                >
+                  <option value="">Todos</option>
+                  <option value="SUBMITTED">Submetida</option>
+                  <option value="RECEIVED">Recebida</option>
+                  <option value="IN_PROGRESS">Em análise</option>
+                  <option value="COMPLETED">Completa</option>
+                  <option value="REPORTED">Reportada</option>
+                  <option value="CANCELLED">Cancelada</option>
+                </select>
+              </label>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setStatusFilter('')
+                  setSearchTerm('')
+                }}
+              >
+                Limpar filtros
+              </Button>
+            </div>
+          )}
         </div>
 
         {isLoading ? (
@@ -125,11 +209,13 @@ export function Samples() {
               <p className="text-gray-600">Carregando amostras...</p>
             </div>
           </div>
-        ) : !samples?.data?.length ? (
+        ) : !filteredSamples.length ? (
           <div className="bg-white rounded-xl shadow-lg p-12 text-center">
             <FlaskConical className="mx-auto text-gray-300 mb-4" size={64} />
             <h3 className="text-xl font-semibold text-gray-800 mb-2">Nenhuma amostra encontrada</h3>
-            <p className="text-gray-600 mb-6">Comece registrando sua primeira amostra</p>
+            <p className="text-gray-600 mb-6">
+              {samples?.data?.length ? 'Ajuste os filtros para ver mais resultados' : 'Comece registrando sua primeira amostra'}
+            </p>
             <Button 
               variant="primary" 
               onClick={() => setShowForm(true)}
@@ -162,7 +248,7 @@ export function Samples() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {samples?.data?.map((sample) => (
+                {filteredSamples.map((sample) => (
                   <tr key={sample.id} className="hover:bg-gray-50 transition">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
@@ -181,11 +267,11 @@ export function Samples() {
                       {new Date(sample.createdAt).toLocaleDateString('pt-PT')}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button className="text-red-600 hover:text-red-700 transition mr-3 font-medium">
+                      <button
+                        onClick={() => setSelectedSample(sample)}
+                        className="text-red-600 hover:text-red-700 transition mr-3 font-medium"
+                      >
                         Ver Detalhes
-                      </button>
-                      <button className="text-gray-600 hover:text-gray-700 transition font-medium">
-                        Editar
                       </button>
                     </td>
                   </tr>
@@ -197,15 +283,8 @@ export function Samples() {
             <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
               <div className="flex items-center justify-between">
                 <div className="text-sm text-gray-700">
-                  Mostrando <span className="font-medium">{samples?.data?.length || 0}</span> amostras
-                </div>
-                <div className="flex gap-2">
-                  <button className="px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                    Anterior
-                  </button>
-                  <button className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700">
-                    Próxima
-                  </button>
+                  Mostrando <span className="font-medium">{filteredSamples.length}</span> de{' '}
+                  <span className="font-medium">{samples?.data?.length || 0}</span> amostras
                 </div>
               </div>
             </div>
@@ -220,6 +299,55 @@ export function Samples() {
             setShowForm(false)
           }}
         />
+      )}
+
+      {selectedSample && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-gray-100 bg-gradient-to-r from-red-600 to-red-700 px-6 py-4 text-white">
+              <div>
+                <h2 className="text-xl font-bold">{selectedSample.sampleNumber}</h2>
+                <p className="text-sm text-red-100">Detalhes da amostra</p>
+              </div>
+              <button onClick={() => setSelectedSample(null)} className="rounded-full p-1 hover:bg-white/10">
+                <X size={22} />
+              </button>
+            </div>
+            <div className="grid gap-4 p-6 md:grid-cols-2">
+              <div className="rounded-xl bg-gray-50 p-4">
+                <div className="text-sm text-gray-500">Equipamento</div>
+                <div className="font-semibold text-gray-900">{selectedSample.equipment?.equipmentNo}</div>
+                <div className="text-sm text-gray-600">{selectedSample.equipment?.description}</div>
+              </div>
+              <div className="rounded-xl bg-gray-50 p-4">
+                <div className="text-sm text-gray-500">Estado</div>
+                <div className="mt-2">{getStatusBadge(selectedSample.status)}</div>
+              </div>
+              <div className="rounded-xl bg-gray-50 p-4">
+                <div className="text-sm text-gray-500">Tipo / Prioridade</div>
+                <div className="font-semibold text-gray-900">{selectedSample.type || '—'} / {selectedSample.priority || '—'}</div>
+              </div>
+              <div className="rounded-xl bg-gray-50 p-4">
+                <div className="text-sm text-gray-500">Leitura</div>
+                <div className="font-semibold text-gray-900">{selectedSample.equipmentReading ?? '—'}</div>
+              </div>
+              <div className="rounded-xl bg-gray-50 p-4">
+                <div className="text-sm text-gray-500">Fluido</div>
+                <div className="font-semibold text-gray-900">
+                  {[selectedSample.fluidType, selectedSample.fluidGrade].filter(Boolean).join(' · ') || '—'}
+                </div>
+              </div>
+              <div className="rounded-xl bg-gray-50 p-4">
+                <div className="text-sm text-gray-500">Criada em</div>
+                <div className="font-semibold text-gray-900">{new Date(selectedSample.createdAt).toLocaleString('pt-PT')}</div>
+              </div>
+              <div className="rounded-xl bg-gray-50 p-4 md:col-span-2">
+                <div className="text-sm text-gray-500">Observações</div>
+                <div className="font-semibold text-gray-900">{selectedSample.customerComment || 'Sem observações.'}</div>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

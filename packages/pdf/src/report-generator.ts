@@ -40,7 +40,7 @@ export interface ReportData {
 }
 
 export class ReportGenerator {
-  private doc: PDFDocument
+  private doc: PDFKit.PDFDocument
   private yPosition: number = 0
 
   constructor() {
@@ -58,7 +58,7 @@ export class ReportGenerator {
     return new Promise((resolve, reject) => {
       const chunks: Buffer[] = []
 
-      this.doc.on('data', (chunk) => chunks.push(chunk))
+      this.doc.on('data', (chunk: Buffer) => chunks.push(chunk))
       this.doc.on('end', () => resolve(Buffer.concat(chunks)))
       this.doc.on('error', reject)
 

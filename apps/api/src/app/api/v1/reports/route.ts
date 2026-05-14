@@ -18,6 +18,7 @@ export async function GET(request: Request) {
     const equipmentId = searchParams.get('equipmentId')
     const startDate = searchParams.get('startDate')
     const endDate = searchParams.get('endDate')
+    const q = searchParams.get('q')?.trim()
 
     const skip = (page - 1) * limit
 
@@ -48,6 +49,15 @@ export async function GET(request: Request) {
       if (endDate) {
         where.reportDate.lte = new Date(endDate)
       }
+    }
+
+    if (q) {
+      where.OR = [
+        { reportNumber: { contains: q, mode: 'insensitive' } },
+        { sample: { sampleNumber: { contains: q, mode: 'insensitive' } } },
+        { sample: { equipment: { equipmentNo: { contains: q, mode: 'insensitive' } } } },
+        { sample: { equipment: { description: { contains: q, mode: 'insensitive' } } } },
+      ]
     }
 
     const [reports, total] = await Promise.all([

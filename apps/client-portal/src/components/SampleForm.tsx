@@ -27,7 +27,7 @@ export function SampleForm({ onClose, onSuccess }: SampleFormProps) {
     componentId: '',
     type: 'ROUTINE',
     priority: 'NORMAL',
-    reading: '',
+    equipmentReading: '',
     fluidType: '',
     fluidGrade: '',
     hoursSinceChange: '',
@@ -50,7 +50,12 @@ export function SampleForm({ onClose, onSuccess }: SampleFormProps) {
   // Mutation para criar amostra
   const createSample = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const response = await portalApi.post('/v1/samples', data)
+      const response = await portalApi.post('/v1/samples', {
+        ...data,
+        componentId: data.componentId || undefined,
+        equipmentReading: data.equipmentReading ? Number(data.equipmentReading) : undefined,
+        hoursSinceChange: data.hoursSinceChange ? Number(data.hoursSinceChange) : undefined,
+      })
       return response.data
     },
     onSuccess: () => {
@@ -69,8 +74,7 @@ export function SampleForm({ onClose, onSuccess }: SampleFormProps) {
 
     // Validações
     if (!formData.equipmentId) newErrors.equipmentId = 'Selecione um equipamento'
-    if (!formData.componentId) newErrors.componentId = 'Selecione um componente'
-    if (!formData.reading) newErrors.reading = 'Informe a leitura'
+    if (!formData.equipmentReading) newErrors.equipmentReading = 'Informe a leitura'
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
@@ -117,7 +121,6 @@ export function SampleForm({ onClose, onSuccess }: SampleFormProps) {
 
             <Select
               label="Componente"
-              required
               value={formData.componentId}
               onChange={(e) =>
                 setFormData({ ...formData, componentId: e.target.value })
@@ -140,9 +143,9 @@ export function SampleForm({ onClose, onSuccess }: SampleFormProps) {
               options={[
                 { value: 'ROUTINE', label: 'Rotina' },
                 { value: 'RESAMPLE', label: 'Reamostragem' },
-                { value: 'EMERGENCY', label: 'Emergência' },
-                { value: 'CORRECTIVE', label: 'Corretiva' },
-                { value: 'COMMISSIONING', label: 'Comissionamento' },
+                { value: 'NEW_EQUIPMENT', label: 'Equipamento novo' },
+                { value: 'INVESTIGATION', label: 'Investigação' },
+                { value: 'POST_MAINTENANCE', label: 'Pós-manutenção' },
               ]}
             />
 
@@ -152,9 +155,9 @@ export function SampleForm({ onClose, onSuccess }: SampleFormProps) {
               value={formData.priority}
               onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
               options={[
-                { value: 'LOW', label: 'Baixa' },
                 { value: 'NORMAL', label: 'Normal' },
                 { value: 'HIGH', label: 'Alta' },
+                { value: 'URGENT', label: 'Urgente' },
               ]}
             />
 
@@ -162,9 +165,9 @@ export function SampleForm({ onClose, onSuccess }: SampleFormProps) {
               label="Leitura (km/horas)"
               type="number"
               required
-              value={formData.reading}
-              onChange={(e) => setFormData({ ...formData, reading: e.target.value })}
-              error={errors.reading}
+              value={formData.equipmentReading}
+              onChange={(e) => setFormData({ ...formData, equipmentReading: e.target.value })}
+              error={errors.equipmentReading}
             />
 
             <Input

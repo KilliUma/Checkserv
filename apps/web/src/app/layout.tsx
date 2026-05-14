@@ -4,6 +4,10 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'WearCheck Africa - Oil Analysis & Condition Monitoring',
   description: 'Líder em análise de fluidos e monitoramento de condições na África',
+  icons: {
+    icon: '/favicon.png',
+    shortcut: '/favicon.png',
+  },
 }
 
 export default function RootLayout({

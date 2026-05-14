@@ -55,10 +55,10 @@ export function AdminDashboard() {
   }
 
   const cards = [
-    { label: 'Utilizadores', value: users?.count || users?.data?.length || 0, icon: Users, tone: 'bg-blue-600' },
-    { label: 'Clientes', value: customers?.count || customers?.data?.length || 0, icon: Building2, tone: 'bg-emerald-600' },
-    { label: 'Amostras', value: samples?.count || samples?.data?.length || 0, icon: FlaskConical, tone: 'bg-orange-600' },
-    { label: 'Relatórios', value: reports?.data?.length || 0, icon: FileText, tone: 'bg-purple-600' },
+    { label: 'Utilizadores', value: users?.count || users?.data?.length || 0, icon: Users, tone: 'from-red-600 to-red-700' },
+    { label: 'Clientes', value: customers?.count || customers?.data?.length || 0, icon: Building2, tone: 'from-gray-800 to-gray-900' },
+    { label: 'Amostras', value: samples?.count || samples?.data?.length || 0, icon: FlaskConical, tone: 'from-red-500 to-red-700' },
+    { label: 'Relatórios', value: reports?.data?.length || 0, icon: FileText, tone: 'from-slate-700 to-gray-900' },
   ]
 
   return (
@@ -73,13 +73,13 @@ export function AdminDashboard() {
         {cards.map((card) => {
           const Icon = card.icon
           return (
-            <div key={card.label} className="rounded-md bg-white p-5 shadow-sm">
+            <div key={card.label} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition hover:shadow-lg">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-sm text-gray-600">{card.label}</div>
                   <div className="mt-1 text-3xl font-bold text-gray-900">{card.value}</div>
                 </div>
-                <div className={`rounded-md p-3 text-white ${card.tone}`}>
+                <div className={`rounded-xl bg-gradient-to-br p-3 text-white shadow-lg ${card.tone}`}>
                   <Icon size={24} />
                 </div>
               </div>
@@ -88,7 +88,7 @@ export function AdminDashboard() {
         })}
       </div>
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="rounded-md bg-white p-5 shadow-sm">
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
           <h2 className="mb-4 font-semibold text-gray-900">Amostras recentes</h2>
           <div className="space-y-3">
             {(samples?.data || []).slice(0, 6).map((sample) => (
@@ -103,7 +103,7 @@ export function AdminDashboard() {
             {!samples?.data?.length && <div className="text-sm text-gray-500">Sem amostras recentes.</div>}
           </div>
         </div>
-        <div className="rounded-md bg-white p-5 shadow-sm">
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
           <h2 className="mb-4 font-semibold text-gray-900">Utilizadores pendentes</h2>
           {!canManage ? (
             <div className="text-sm text-gray-500">Reservado a administradores da plataforma.</div>

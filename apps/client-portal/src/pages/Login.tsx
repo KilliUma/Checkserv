@@ -164,9 +164,9 @@ export function Login() {
                         <input type="checkbox" className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500" />
                         <span className="text-gray-600">Lembrar-me</span>
                       </label>
-                      <a href="#" className="text-red-600 hover:text-red-700 font-medium">
+                      <Link to="/recuperar-senha" className="text-red-600 hover:text-red-700 font-medium">
                         Esqueceu a senha?
-                      </a>
+                      </Link>
                     </div>
 
                     {/* Submit Button */}

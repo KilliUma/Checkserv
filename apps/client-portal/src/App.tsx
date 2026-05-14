@@ -1,4 +1,4 @@
-import { Router, Route, RootRoute, RouterProvider, Outlet, Navigate } from '@tanstack/react-router'
+import { Router, Route, RootRoute, RouterProvider, Navigate } from '@tanstack/react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { Toaster } from 'react-hot-toast'
@@ -9,10 +9,14 @@ import { Samples } from './pages/Samples'
 import { Reports } from './pages/Reports'
 import { Equipment } from './pages/Equipment'
 import { Login } from './pages/Login'
+import { ForgotPassword } from './pages/ForgotPassword'
+import { Profile } from './pages/Profile'
 import { Register } from './pages/Register'
+import { Settings } from './pages/Settings'
 import { Header } from './components/Header'
 import { Footer } from './components/Footer'
 import { AdminLayout } from './components/AdminLayout'
+import { ClientLayout } from './components/ClientLayout'
 import { LanguageProvider } from './contexts/LanguageContext'
 import { useAuthStore } from './stores/authStore'
 import { routerBasePath, withBasePath } from './utils/basePath'
@@ -76,11 +80,7 @@ function ProtectedLayout() {
     return null
   }
 
-  return (
-    <Layout>
-      <Outlet />
-    </Layout>
-  )
+  return <ClientLayout />
 }
 
 function AdminProtectedLayout() {
@@ -157,6 +157,12 @@ const loginRoute = new Route({
   component: Login,
 })
 
+const forgotPasswordRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: '/recuperar-senha',
+  component: ForgotPassword,
+})
+
 const registerRoute = new Route({
   getParentRoute: () => rootRoute,
   path: '/registro',
@@ -197,6 +203,18 @@ const equipmentRoute = new Route({
   getParentRoute: () => protectedRoute,
   path: '/equipamentos',
   component: Equipment,
+})
+
+const profileRoute = new Route({
+  getParentRoute: () => protectedRoute,
+  path: '/perfil',
+  component: Profile,
+})
+
+const settingsRoute = new Route({
+  getParentRoute: () => protectedRoute,
+  path: '/configuracoes',
+  component: Settings,
 })
 
 const adminIndexRoute = new Route({
@@ -266,12 +284,15 @@ const adminSettingsRoute = new Route({
 const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
+  forgotPasswordRoute,
   registerRoute,
   protectedRoute.addChildren([
     dashboardRoute,
     samplesRoute,
     reportsRoute,
     equipmentRoute,
+    profileRoute,
+    settingsRoute,
   ]),
   adminProtectedRoute.addChildren([
     adminIndexRoute,

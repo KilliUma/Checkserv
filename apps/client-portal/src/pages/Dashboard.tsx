@@ -110,27 +110,26 @@ export function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-red-600 to-red-700 text-white pt-32 pb-12">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-red-50">
+      <div className="border-b border-gray-200 bg-white">
         <div className="container mx-auto px-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between py-8">
             <div className="flex-1">
-              <h1 className="text-4xl font-bold mb-2">
+              <h1 className="mb-2 text-3xl font-bold text-gray-900">
                 Bem-vindo, {session?.user?.name?.split(' ')[0] || 'Usuário'}! 👋
               </h1>
-              <p className="text-red-100 text-lg">
+              <p className="text-gray-600">
                 Aqui está um resumo da sua atividade recente
               </p>
             </div>
             <div className="hidden lg:block">
-              <Activity size={80} className="text-red-300 opacity-50" />
+              <Activity size={64} className="text-red-100" />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-6 -mt-8 pb-12">
+      <div className="container mx-auto px-6 py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Amostras */}
@@ -205,7 +204,7 @@ export function Dashboard() {
               </div>
               <Button 
                 onClick={() => navigate({ to: '/amostras' })}
-                className="mt-4 bg-white text-red-600 hover:bg-red-50 w-full justify-center"
+                className="mt-4 !bg-white !text-red-600 hover:!bg-red-50 w-full justify-center"
               >
                 Registrar Agora
               </Button>
