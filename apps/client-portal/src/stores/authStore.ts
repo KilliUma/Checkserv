@@ -62,10 +62,10 @@ export const useAuthStore = create<AuthStore>((set) => ({
   },
 
   login: async (email: string, password: string) => {
-    const response = await api.post('/auth/signin', { email, password })
-    
-    if (response.data.error) {
-      throw new Error(response.data.error)
+    try {
+      await api.post('/auth/signin', { email, password })
+    } catch (error: any) {
+      throw new Error(error.response?.data?.error || 'Erro ao iniciar sessão')
     }
 
     // Confirma persistencia da sessao via cookie antes de marcar login como concluido.

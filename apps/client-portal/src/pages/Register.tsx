@@ -72,7 +72,7 @@ export function Register() {
         throw new Error(data.error || 'Erro ao criar conta')
       }
 
-      toast.success('Conta criada com sucesso! Faça login para continuar.')
+      toast.success(data.message || 'Conta criada com sucesso! Aguarde a aprovação do administrador.')
       navigate({ to: '/login' })
     } catch (err: any) {
       toast.error(err.message || 'Erro ao criar conta')

@@ -21,8 +21,8 @@ export function Login() {
       await login(email, password)
       toast.success('Login realizado com sucesso!')
       navigate({ to: '/dashboard' })
-    } catch (err) {
-      toast.error('Credenciais inválidas')
+    } catch (err: any) {
+      toast.error(err.message || 'Não foi possível iniciar sessão')
     } finally {
       setIsLoading(false)
     }
