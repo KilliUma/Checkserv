@@ -1,13 +1,18 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ['@wearcheck/auth', '@wearcheck/database', '@wearcheck/types'],
+  transpilePackages: ['@wearcheck/auth', '@wearcheck/database', '@wearcheck/pdf', '@wearcheck/types'],
   experimental: {
     serverActions: {
       bodySizeLimit: '10mb',
     },
   },
   webpack: (config) => {
-    config.externals = [...(config.externals || []), '@prisma/engines', '@prisma/client/runtime']
+    config.externals = [
+      ...(config.externals || []),
+      '@prisma/engines',
+      '@prisma/client/runtime',
+      'pdfkit',
+    ]
     return config
   },
   typescript: {
