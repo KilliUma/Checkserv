@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { verify } from 'jsonwebtoken'
 
 export interface AuthTokenPayload {
@@ -9,7 +9,10 @@ export interface AuthTokenPayload {
 }
 
 export function getAuthTokenPayload(): AuthTokenPayload | null {
-  const token = cookies().get('auth-token')?.value
+  const cookieToken = cookies().get('auth-token')?.value
+  const authHeader = headers().get('authorization')
+  const bearerToken = authHeader?.match(/^Bearer\s+(.+)$/i)?.[1]
+  const token = cookieToken || bearerToken
 
   if (!token) {
     return null

@@ -1,5 +1,9 @@
 import { create } from 'zustand'
-import { portalApi as api } from '../lib/apiClient'
+import {
+  clearStoredAuthToken,
+  portalApi as api,
+  setStoredAuthToken,
+} from '../lib/apiClient'
 
 interface AuthSession {
   user: {
@@ -54,10 +58,17 @@ export const useAuthStore = create<AuthStore>((set) => ({
   },
 
   login: async (email: string, password: string) => {
+    let token: string | undefined
+
     try {
-      await api.post('/auth/signin', { email, password })
+      const { data } = await api.post('/auth/signin', { email, password })
+      token = data?.token
     } catch (error: any) {
       throw new Error(error.response?.data?.error || 'Erro ao iniciar sessão')
+    }
+
+    if (token) {
+      setStoredAuthToken(token)
     }
 
     // Confirma persistencia da sessao via cookie antes de marcar login como concluido.
@@ -74,7 +85,12 @@ export const useAuthStore = create<AuthStore>((set) => ({
   },
 
   logout: async () => {
-    await api.post('/auth/signout')
+    try {
+      await api.post('/auth/signout')
+    } finally {
+      clearStoredAuthToken()
+    }
+
     set({ 
       session: null, 
       isAuthenticated: false 
